@@ -1,5 +1,5 @@
 """
-classe permettant de crée les dataframes à partir des fichiers de données
+classe permettant de créer les dataframes à partir des fichiers de données
 """
 import os
 from pathlib import Path
