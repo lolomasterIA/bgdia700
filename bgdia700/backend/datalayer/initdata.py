@@ -29,7 +29,7 @@ class DataLayer:
             return pd.read_pickle(file)
 
     def load_data(self):
-        """Charge tous les fichiers de données dans les attributs appropriés."""
+        """Charge tous les fichiers de données dans les attributs appropriés"""
         # Charger les fichiers CSV
         self.interactions_test = self.load_csv(
             str(data_dir) + "/interactions_test.csv")
