@@ -32,10 +32,15 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    # Étape 3 : Installer Poetry
+    # Étape 3.1 : Installer Poetry
     - name: Install Poetry
       run: |
         curl -sSL https://install.python-poetry.org | python3 -
+
+    # Étape 3.2 : Installer Poetry
+    - name: Install flake8
+      run: |
+        pip install flake8
 
     # Étape 4 : Installer les dépendances du projet via Poetry
     - name: Install dependencies with Poetry
