@@ -1,0 +1,75 @@
+#Actions de validation lors d'un push ou d'une pull request sur le repo :
+
+name: tests et validation avant ajout sur la branche main
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.11]
+
+    steps:
+    # Étape 1 : Cloner le dépôt
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Étape 2 : Installer Python
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    # Étape 3 : Installer Poetry
+    - name: Install Poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+
+    # Étape 4 : Installer les dépendances du projet via Poetry
+    - name: Install dependencies with Poetry
+      run: |
+        poetry install
+
+    # Étape 5 : Vérifier la conformité PEP8 avec flake8
+    - name: Check code style (PEP8) with flake8
+      run: |
+        poetry run flake8 .
+      env:
+        # Configuration pour ignorer certaines erreurs si nécessaire
+        # FLAKE8_IGNORE: E501  # Ignorer les lignes trop longues (>79 chars)
+
+
+    # Étape 6 : Vérifier la documentation et les commentaires avec pydocstyle
+    - name: Check documentation with pydocstyle
+      run: |
+        poetry run pydocstyle .
+
+    # Étape 7 : Vérifier les bonnes pratiques de sécurité et de gestion des exceptions avec bandit
+    - name: Security check and exception handling (log) with bandit
+      run: |
+        poetry run bandit -r .
+
+    # Étape 8 : Exécuter les tests unitaires
+    - name: Run unit tests with pytest
+      run: |
+        poetry run pytest --cov=./ --cov-report=xml
+      env:
+        # Configuration pour s'assurer que la couverture est suffisante
+        PYTEST_ADDOPTS: "--maxfail=1 --disable-warnings"
+
+    # Étape 9 : Vérifier les dépendances obsolètes
+    - name: Check for outdated dependencies
+      run: |
+        poetry update --dry-run
