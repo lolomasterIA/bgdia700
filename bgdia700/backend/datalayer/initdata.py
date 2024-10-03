@@ -1,6 +1,9 @@
-import pandas as pd
+"""
+classe permettant de crée les dataframes à partir des fichiers de données 
+"""
 import os
 from pathlib import Path
+import pandas as pd
 from dotenv import load_dotenv
 
 
@@ -48,6 +51,7 @@ class DataLayer:
 
     # Recupere les données des fichiers et les ajoute dans un dataframe
     def get_interactions_test(self):
+        """getter interaction_test"""
         return self.interactions_test
 
     def get_interactions_train(self):
