@@ -46,10 +46,6 @@ jobs:
     - name: Check code style (PEP8) with flake8
       run: |
         poetry run flake8 .
-      env:
-        # Configuration pour ignorer certaines erreurs si nécessaire
-        # FLAKE8_IGNORE: E501  # Ignorer les lignes trop longues (>79 chars)
-
 
     # Étape 6 : Vérifier la documentation et les commentaires avec pydocstyle
     - name: Check documentation with pydocstyle
