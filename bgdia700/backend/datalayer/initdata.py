@@ -101,19 +101,25 @@ class DataLayer:
         return self.interactions_train
 
     def get_interactions_validation(self):
+        """récupère les données du fichier interactions_validation"""
         return self.interactions_validation
 
     def get_pp_recipes(self):
+        """récupère les données du fichier pp_recipes"""
         return self.pp_recipes
 
     def get_pp_users(self):
+        """récupère les données du fichier pp_users"""
         return self.pp_users
 
     def get_raw_interactions(self):
+        """récupère les données du fichier raw_interactions"""
         return self.raw_interactions
 
     def get_raw_recipes(self):
+        """récupère les données du fichier raw_recipes"""
         return self.raw_recipes
 
     def get_ingr_map(self):
+        """récupère les données du fichier ingr_map"""
         return self.ingr_map
