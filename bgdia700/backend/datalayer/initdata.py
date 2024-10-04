@@ -1,4 +1,4 @@
-"""Création dataframes à partir des fichiers de données"""
+"""Création dataframes à partir des fichiers de données."""
 import os
 from pathlib import Path
 import pandas as pd
@@ -22,9 +22,10 @@ class FileUnreadableError(DataLayerException):
 
 
 class DataLayer:
-    """objet regroupant les structures (dataframe) des fichiers de données"""
+    """objet regroupant les structures (dataframe) des fichiers de données."""
 
     def __init__(self):
+        """Créer les variable pour chaque fichier à importer."""
         self.interactions_test = None
         self.interactions_train = None
         self.interactions_validation = None
@@ -93,33 +94,33 @@ class DataLayer:
 
     # Recupere les données des fichiers et les ajoute dans un dataframe
     def get_interactions_test(self):
-        """getter interaction_test"""
+        """Getter interaction_test."""
         return self.interactions_test
 
     def get_interactions_train(self):
-        """getter interactions_train"""
+        """Getter interactions_train."""
         return self.interactions_train
 
     def get_interactions_validation(self):
-        """récupère les données du fichier interactions_validation"""
+        """Récupère les données du fichier interactions_validation."""
         return self.interactions_validation
 
     def get_pp_recipes(self):
-        """récupère les données du fichier pp_recipes"""
+        """Récupère les données du fichier pp_recipes."""
         return self.pp_recipes
 
     def get_pp_users(self):
-        """récupère les données du fichier pp_users"""
+        """Récupère les données du fichier pp_users."""
         return self.pp_users
 
     def get_raw_interactions(self):
-        """récupère les données du fichier raw_interactions"""
+        """Récupère les données du fichier raw_interactions."""
         return self.raw_interactions
 
     def get_raw_recipes(self):
-        """récupère les données du fichier raw_recipes"""
+        """Récupère les données du fichier raw_recipes."""
         return self.raw_recipes
 
     def get_ingr_map(self):
-        """récupère les données du fichier ingr_map"""
+        """Récupère les données du fichier ingr_map."""
         return self.ingr_map
