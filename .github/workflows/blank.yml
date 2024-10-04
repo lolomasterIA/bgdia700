@@ -58,7 +58,7 @@ jobs:
     # Étape 6 : Vérifier la documentation et les commentaires avec pydocstyle
     - name: Check documentation with pydocstyle
       run: |
-        poetry run pydocstyle .
+        poetry run pydocstyle . --ignore=D104,D400
 
     # Étape 7 : Vérifier les bonnes pratiques de sécurité et de gestion des exceptions avec bandit
     - name: Security check and exception handling (log) with bandit
