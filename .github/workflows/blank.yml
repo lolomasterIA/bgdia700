@@ -37,10 +37,13 @@ jobs:
       run: |
         curl -sSL https://install.python-poetry.org | python3 -
 
-    # Étape 3.2 : Installer Poetry
-    - name: Install flake8
+    # Étape 3.2 : Installer outil de validation
+    - name: Install tools
       run: |
         pip install flake8
+        pip install pydocstyle
+        pip install bandit
+        pip install pytest
 
     # Étape 4 : Installer les dépendances du projet via Poetry
     - name: Install dependencies with Poetry
@@ -71,11 +74,8 @@ jobs:
         PYTEST_ADDOPTS: "--maxfail=1 --disable-warnings"
 
     # Étape 9 : Vérifier les dépendances obsolètes
-    - name: Check for outdated dependencies
-      run: |
-        poetry update --dry-run
-    
-    # Étape 10 : Linter ?
-    #- name: todo
+    #- name: Check for outdated dependencies
     #  run: |
-    #    #Todo
+    #    poetry update --dry-run
+    
+
