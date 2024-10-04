@@ -10,14 +10,17 @@ data_dir = Path(os.getenv('DATA_DIR', './data'))
 
 
 class DataLayerException(Exception):
+
     """Classe de base pour les exceptions de DataLayer."""
 
 
 class FileUnreadableError(DataLayerException):
+
     """Exception levée lorsque le fichier n'est pas lisible."""
 
 
 class DataLayer:
+
     """objet regroupant les structures (dataframe) des fichiers de données."""
 
     def __init__(self):
