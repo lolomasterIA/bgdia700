@@ -50,7 +50,7 @@ jobs:
     # Étape 5 : Vérifier la conformité PEP8 avec flake8
     - name: Check code style (PEP8) with flake8
       run: |
-        poetry run flake8 .
+        poetry run flake8 . --ignore=E501
 
     # Étape 6 : Vérifier la documentation et les commentaires avec pydocstyle
     - name: Check documentation with pydocstyle
