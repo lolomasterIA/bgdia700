@@ -1,0 +1,8 @@
+[tool.poetry]
+name = "datalayer"
+version = "0.1.0"
+description = "Module de gestion des données"
+bgdia700 = {path = "./bgdia700"}
+
+[tool.poetry.dependencies]
+python = "^3.11"

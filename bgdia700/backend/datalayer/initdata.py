@@ -1,6 +1,4 @@
-"""
-classe permettant de créer les dataframes à partir des fichiers de données
-"""
+"""Création dataframes à partir des fichiers de données"""
 import os
 from pathlib import Path
 import pandas as pd
@@ -11,7 +9,21 @@ load_dotenv()
 data_dir = Path(os.getenv('DATA_DIR', './data'))
 
 
+class DataLayerException(Exception):
+    """Classe de base pour les exceptions de DataLayer."""
+
+
+# class FileNotFoundError(DataLayerException):
+#    """Exception levée lorsque le fichier n'est pas trouvé."""
+
+
+class FileUnreadableError(DataLayerException):
+    """Exception levée lorsque le fichier n'est pas lisible."""
+
+
 class DataLayer:
+    """objet regroupant les structures (dataframe) des fichiers de données"""
+
     def __init__(self):
         self.interactions_test = None
         self.interactions_train = None
@@ -24,12 +36,42 @@ class DataLayer:
 
     def load_csv(self, file_path):
         """Charge un fichier CSV en DataFrame pandas."""
-        return pd.read_csv(file_path)
+        try:
+            # Vérifier si le fichier existe et est lisible
+            if not os.path.exists(file_path):
+                raise FileNotFoundError(
+                    f"Le fichier {file_path} est introuvable.")
+            if not os.access(file_path, os.R_OK):
+                raise FileUnreadableError(
+                    f"Le fichier {file_path} n'est pas lisible.")
+
+            return pd.read_csv(file_path)
+        except pd.errors.EmptyDataError as e:
+            raise FileUnreadableError(
+                f"Le fichier {file_path} est vide ou corrompu.") from e
+        except Exception as e:
+            raise DataLayerException(
+                f"Erreur lors du chargement du fichier CSV {file_path}: {str(e)}") from e
 
     def load_pickle(self, file_path):
         """Charge un fichier pickle."""
-        with open(file_path, 'rb') as file:
-            return pd.read_pickle(file)
+        try:
+            # Vérifier si le fichier existe et est lisible
+            if not os.path.exists(file_path):
+                raise FileNotFoundError(
+                    f"Le fichier {file_path} est introuvable.")
+            if not os.access(file_path, os.R_OK):
+                raise FileUnreadableError(
+                    f"Le fichier {file_path} n'est pas lisible.")
+
+            with open(file_path, 'rb') as file:
+                return pd.read_pickle(file)
+        except pd.errors.EmptyDataError as e:
+            raise FileUnreadableError(
+                f"Erreur lors de la lecture du fichier pickle {file_path}.") from e
+        except Exception as e:
+            raise DataLayerException(
+                f"Erreur lors du chargement du fichier pickle {file_path}: {str(e)}") from e
 
     def load_data(self):
         """Charge tous les fichiers de données"""
@@ -55,6 +97,7 @@ class DataLayer:
         return self.interactions_test
 
     def get_interactions_train(self):
+        """getter interactions_train"""
         return self.interactions_train
 
     def get_interactions_validation(self):
