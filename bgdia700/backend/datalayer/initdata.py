@@ -13,10 +13,6 @@ class DataLayerException(Exception):
     """Classe de base pour les exceptions de DataLayer."""
 
 
-# class FileNotFoundError(DataLayerException):
-#    """Exception levée lorsque le fichier n'est pas trouvé."""
-
-
 class FileUnreadableError(DataLayerException):
     """Exception levée lorsque le fichier n'est pas lisible."""
 
@@ -75,7 +71,7 @@ class DataLayer:
                 f"Erreur lors du chargement du fichier pickle {file_path}: {str(e)}") from e
 
     def load_data(self):
-        """Charge tous les fichiers de données"""
+        """Charge tous les fichiers de données."""
         # Charger les fichiers CSV
         self.interactions_test = self.load_csv(
             str(data_dir) + "/interactions_test.csv")
