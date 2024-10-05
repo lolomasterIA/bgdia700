@@ -44,6 +44,7 @@ jobs:
         pip install pydocstyle
         pip install bandit
         pip install pytest
+        pip install pytest-cov
 
     # Étape 4 : Installer les dépendances du projet via Poetry
     - name: Install dependencies with Poetry
