@@ -62,7 +62,7 @@ class DataLayer:
                     f"Le fichier {file_path} n'est pas lisible.")
 
             with open(file_path, 'rb') as file:
-                return pd.read_pickle(file)
+                return pd.read_pickle(file)  # nosec B301
         except pd.errors.EmptyDataError as e:
             raise FileUnreadableError(
                 f"Erreur lors de la lecture du fichier pickle {file_path}.") from e

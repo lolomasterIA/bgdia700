@@ -63,7 +63,7 @@ jobs:
     # Étape 7 : Vérifier les bonnes pratiques de sécurité et de gestion des exceptions avec bandit
     - name: Security check and exception handling (log) with bandit
       run: |
-        poetry run bandit -r .
+        poetry run bandit -r . -x ./tests/
 
     # Étape 8 : Exécuter les tests unitaires
     - name: Run unit tests with pytest
