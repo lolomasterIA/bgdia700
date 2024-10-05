@@ -71,7 +71,8 @@ jobs:
       run: |
         export PYTHONPATH="${PYTHONPATH}:$(pwd)"
         export PYTHONPATH="${PYTHONPATH}:$(pwd)/backend"
-        export PYTHONPATH="${PYTHONPATH}:$(pwd)/backend/datalayer"
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)/../backend"
+        export PYTHONPATH="${PYTHONPATH}:$(pwd)/../backend/datalayer"
         echo $PYTHONPATH
 
     # Étape 8 : Exécuter les tests unitaires
