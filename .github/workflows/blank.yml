@@ -69,8 +69,9 @@ jobs:
     # Étape 7 : Vérifier les bonnes pratiques de sécurité et de gestion des exceptions avec bandit
     - name: PYTHONPATH
       run: |
-         export PYTHONPATH="${PYTHONPATH}:$(pwd):bgdia700:bgdia700\backend:bgdia700\backend\datalayer"
-      
+        export PYTHONPATH="${PYTHONPATH}:$(pwd):bgdia700:bgdia700\backend:bgdia700\backend\datalayer"
+        echo $PYTHONPATH
+
     # Étape 8 : Exécuter les tests unitaires
     - name: Run unit tests with pytest
       run: |
