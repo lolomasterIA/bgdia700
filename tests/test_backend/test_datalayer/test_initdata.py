@@ -1,7 +1,7 @@
 from unittest import mock
 import pandas as pd
 import pytest
-from initdata import DataLayer, FileUnreadableError, DataLayerException
+from initdata import DataLayer, FileUnreadableError
 
 
 @pytest.fixture
