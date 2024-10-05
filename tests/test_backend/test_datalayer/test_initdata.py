@@ -1,7 +1,7 @@
 from unittest import mock
 import pandas as pd
 import pytest
-from bgdia700.backend.datalayer.initdata import DataLayer, FileUnreadableError
+from initdata import DataLayer, FileUnreadableError
 
 
 @pytest.fixture
