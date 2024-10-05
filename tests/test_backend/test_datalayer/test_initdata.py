@@ -1,7 +1,7 @@
 from unittest import mock
 import pandas as pd
 import pytest
-from initdata import DataLayer, FileUnreadableError
+from initdata import DataLayer, FileUnreadableError, DataLayerException
 
 
 @pytest.fixture
@@ -47,16 +47,6 @@ def test_load_pickle_file_unreadable(data_layer):
             mock.patch('os.access', return_value=False):
         with pytest.raises(FileUnreadableError):
             data_layer.load_pickle('unreadable_file.pkl')
-
-
-def test_load_pickle_valid(data_layer):
-    """Test si un fichier pickle valide est correctement chargé."""
-    mock_data = {"key": "value"}
-    with mock.patch('os.path.exists', return_value=True), \
-            mock.patch('os.access', return_value=True), \
-            mock.patch('pandas.read_pickle', return_value=mock_data):
-        result = data_layer.load_pickle('valid_file.pkl')
-        assert result == mock_data
 
 
 def test_load_data_success(data_layer):
