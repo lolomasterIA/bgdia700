@@ -1,9 +1,8 @@
+import pytest
 from unittest import mock
 import pandas as pd
-import pytest
-import sys
-print(sys.path)
 from src.backend.datalayer.initdata import DataLayer, FileUnreadableError
+
 
 @pytest.fixture
 def data_layer():
@@ -55,7 +54,7 @@ def test_load_data_success(data_layer):
     # Mocker toutes les lectures de fichiers CSV et pickle
     mock_csv_data = pd.DataFrame({"column": [1, 2, 3]})
     mock_pickle_data = {"key": "value"}
-    
+
     with mock.patch('os.path.exists', return_value=True), \
             mock.patch('os.access', return_value=True), \
             mock.patch('pandas.read_csv', return_value=mock_csv_data), \
