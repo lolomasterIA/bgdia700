@@ -1,4 +1,5 @@
 """Toutes les fonction / traitement back (couche métier)."""
+
 from datalayer.initdata import DataLayer
 
 # Créer une instance de la classe DataLayer
