@@ -116,7 +116,7 @@ class DataLayer:
         self.raw_recipes = self.load_csv(str(data_dir) + '/RAW_recipes.csv')
 
         # Charger le fichier pickle
-        self.ingr_map = self.load_pickle(str(data_dir) + '/ingr_map.pkl')
+        # self.ingr_map = self.load_pickle(str(data_dir) + '/ingr_map.pkl')
 
     # Recupere les données des fichiers et les ajoute dans un dataframe
     def get_interactions_test(self):

@@ -1,23 +1,30 @@
-"""Toutes les fonction / traitement back (couche métier)."""
-from datalayer.initdata import DataLayer
+import src.backend.datalayer.cooking as cook
+from dotenv import load_dotenv
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 
-# Créer une instance de la classe DataLayer
-data_layer = DataLayer()
+# Charger les variables d'environnement
+load_dotenv()
 
-# Charger toutes les données
-data_layer.load_data()
+DB_USER = os.getenv('DB_USER')
+DB_PASS = os.getenv('DB_PASS')
+DB_HOST = os.getenv('DB_HOST')
+DB_NAME = os.getenv('DB_NAME')
 
-# Accéder aux données chargées
-interactions_test_df = data_layer.get_interactions_test()
-pp_recipes_df = data_layer.get_pp_recipes()
-pickle = data_layer.get_ingr_map()
+# Connexion à la base de données PostgreSQL
+DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:5432/{DB_NAME}"
+engine = create_engine(DATABASE_URL)
+Base = declarative_base()
 
-# Afficher quelques exemples de données
-print("Exemples d'interactions de test:")
-print(interactions_test_df.head())
+# Configuration de la session SQLAlchemy
+Session = sessionmaker(bind=engine)
+session = Session()
 
-print("\nExemples de recettes:")
-print(pp_recipes_df.head())
+recette = cook.Recipe(session, id=40893)
+print(recette.to_dataframe())
 
-print("\nExemples pickles:")
-print(pickle.head())
+reviews = cook.Review.get_all(session, rating=1)
+print(reviews.to_dataframe())
+
+session.close()
