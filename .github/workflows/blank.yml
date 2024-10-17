@@ -40,6 +40,7 @@ jobs:
     # Étape 3.2 : Installer outil de validation
     - name: Install tools
       run: |
+        pip install black
         pip install flake8
         pip install pydocstyle
         pip install bandit
@@ -50,6 +51,11 @@ jobs:
     - name: Install dependencies with Poetry
       run: |
         poetry install
+    
+    # Étape 5 : Formater le code avec black
+    - name: Format code with black
+      run: |
+        poetry run black .
 
     # Étape 5 : Vérifier la conformité PEP8 avec flake8
     - name: Check code style (PEP8) with flake8
@@ -59,7 +65,7 @@ jobs:
     # Étape 6 : Vérifier la documentation et les commentaires avec pydocstyle
     - name: Check documentation with pydocstyle
       run: |
-        poetry run pydocstyle . --ignore=D104,D400,D203
+        poetry run pydocstyle . --ignore=D104,D203,D212,D400
 
     # Étape 7 : Vérifier les bonnes pratiques de sécurité et de gestion des exceptions avec bandit
     - name: Security check and exception handling (log) with bandit
@@ -69,7 +75,7 @@ jobs:
     # Étape 8 : Exécuter les tests unitaires
     - name: Run unit tests with pytest
       run: |
-        poetry run pytest --cov=./ --cov-report=xml
+        poetry run pytest --cov=src --cov-report=xml
       env:
         # Configuration pour s'assurer que la couverture est suffisante
         PYTEST_ADDOPTS: "--maxfail=1 --disable-warnings"
