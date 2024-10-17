@@ -1,8 +1,32 @@
+"""
+Module de configuration du logging pour l'application.
+
+Ce module configure et retourne un logger pour l'application, en créant
+un répertoire `logs` s'il n'existe pas, et en configurant deux handlers
+de logging : un pour les messages de debug et un pour les messages d'erreur.
+Les logs de debug sont enregistrés dans `logs/debug.log` et les logs d'erreur
+dans `logs/error.log`.
+"""
+
 import logging
 import os
 
 
 def setup_logging():
+    """
+    Configure et retourne un logger pour l'application.
+
+    Cette fonction crée un répertoire `logs` s'il n'existe pas, puis configure
+    deux handlers de logging : un pour les messages de debug et un pour les messages
+    d'erreur. Les logs de debug sont enregistrés dans `logs/debug.log` et les logs
+    d'erreur dans `logs/error.log`.
+
+    Returns
+    -------
+    logging.Logger
+        Le logger configuré.
+
+    """
     # Créer le répertoire logs s'il n'existe pas
     if not os.path.exists("logs"):
         os.makedirs("logs")
