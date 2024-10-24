@@ -21,10 +21,13 @@ Base = declarative_base()
 Session = sessionmaker(bind=engine)
 session = Session()
 
+
 # Meta classe pour avoir des getters lisibles des objets
-
-
 class ObjectCollection:
+    """
+    Pour convertire la collection d'objets en DataFrame.
+    """
+
     def __init__(self, objects):
         self.objects = objects
 
@@ -35,13 +38,29 @@ class ObjectCollection:
         data = [obj.as_dict() for obj in self.objects]
         return pd.DataFrame(data)
 
+    def __iter__(self):
+        """
+        Permet l'itération sur la collection d'objets.
+        """
+        return iter(self.objects)
+
+    def __len__(self):
+        """
+        Permet d'utiliser len() pour obtenir le nombre d'objets dans la collection.
+        """
+        return len(self.objects)
+
 
 class BaseModel:
+    """
+    Récupère tous les objets ou applique des filtres dynamiques.
+    Retourne une ObjectCollection qui permet la conversion en DataFrame.
+    """
     @classmethod
     def get_all(cls, session, **filters):
         """
         Récupère tous les objets ou applique des filtres dynamiques. 
-        Retourne une ObjectCollection qui permet la conversion en DataFrame.
+        Retourne une ObjectCollection .
         """
         query = session.query(cls)
 
@@ -91,9 +110,8 @@ recipe_ingredient = Table(
     Column('ingredient_id', Integer, ForeignKey('ingredient.ingredient_id'))
 )
 
+
 # Modèle Contributor
-
-
 class Contributor(Base, BaseModel):
     __tablename__ = 'contributor'
     contributor_id = Column(Integer, primary_key=True)
@@ -113,9 +131,8 @@ class Contributor(Base, BaseModel):
             for key, value in kwargs.items():
                 setattr(self, key, value)
 
+
 # Modèle Recipe
-
-
 class Recipe(Base, BaseModel):
     __tablename__ = 'recipe'
 
