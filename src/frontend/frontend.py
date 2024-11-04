@@ -5,8 +5,8 @@ Frontend va fournir l'ensemble des méthodes permettant l'affichage
 import streamlit as st
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
+import plotly.express as px
 
 
 def generate_layout():
@@ -43,7 +43,12 @@ def display_kmeans_ingredient(df_recipes_ingredients):
     # Affichage des clusters sous forme de graphique
     st.title("Visualisation des clusters de recettes")
     st.write("Voici les clusters obtenus à partir des ingrédients des recettes:")
+    fig = px.scatter(df_recipes_ingredients, x='pca_x', y='pca_y', color='cluster_count',
+                     hover_data=['id_recipe', 'ingredients'], title="Cluster des recettes en fonction des ingrédients")
+    st.plotly_chart(fig)
 
+
+"""
     # Visualisation avec Matplotlib
     plt.figure(figsize=(10, 6))
     for cluster in df_recipes_ingredients['cluster_count'].unique():
@@ -55,4 +60,4 @@ def display_kmeans_ingredient(df_recipes_ingredients):
     plt.ylabel("PCA Component 2")
     plt.title("Cluster des recettes en fonction des ingrédients")
     plt.legend()
-    st.pyplot(plt)
+    st.pyplot(plt)"""

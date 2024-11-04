@@ -12,6 +12,7 @@ import os
 from sqlalchemy import create_engine
 import src.backend.backend as backend
 import src.frontend.frontend as frontend
+import plotly.express as px
 
 
 # Charger les variables d'environnement
@@ -88,16 +89,22 @@ if __name__ == "__main__":
             st.dataframe(styled_top_10, use_container_width=True)
 
         with col2:
+            # Créer le graphique en barres avec Plotly
             st.subheader(
                 "Nb recettes (total : " + str(total_recettes) + ") / nb ingrédients")
-            plt.figure(figsize=(12, 8))
-            plt.bar(nombre_ingredients, nombre_recettes)
-            plt.xlabel("Nombre d'ingrédients")
-            plt.ylabel("Nombre de recettes")
-            plt.title("Nombre de recettes en fonction du nombre d'ingrédients")
-            plt.xticks(nombre_ingredients)
-            plt.xticks(range(1, 41, 2))
-            st.pyplot(plt)
+            fig = px.bar(
+                x=nombre_ingredients,
+                y=nombre_recettes,
+                labels={"x": "Nombre d'ingrédients",
+                        "y": "Nombre de recettes"},
+                title="Nombre de recettes en fonction du nombre d'ingrédients"
+            )
+
+            # Ajuster l'axe X pour afficher tous les deux chiffres
+            fig.update_xaxes(dtick=2)
+
+            # Afficher le graphique dans Streamlit
+            st.plotly_chart(fig, use_container_width=True)
 
         with col3:
             styled_top_10 = df_ingredient_total_rating1.head(10).style.highlight_max(axis=0, color="lightgreen").highlight_min(
@@ -114,10 +121,9 @@ if __name__ == "__main__":
             st.dataframe(styled_top_10, use_container_width=True)
 
     elif menu == "Page 2":
-        st.subheader(
-            "page 2")
-        df = backend.generate_kmeans_ingredient(session, 3)
-        frontend.display_kmeans_ingredient(df)
+        with col1:
+            df = backend.generate_kmeans_ingredient(session, 3)
+            frontend.display_kmeans_ingredient(df)
 
     elif menu == "Page 3":
         st.subheader(

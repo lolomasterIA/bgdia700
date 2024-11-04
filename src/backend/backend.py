@@ -69,6 +69,11 @@ def top_ingredient_rating(session):
 # Clusterisation des ingrédients
 # Création d'une matrice binaire (recette x ingrédient)
 def generate_kmeans_ingredient(session, nb_cluster):
+    # réduction du dataset, on enlève :
+    # les recettes avec moins de 3 ingrédientss
+    # les recettes avec moins de 20 reviews
+    # les ingrédients qui apparaissent dans moins de 5 recettes
+    # et les ingrédients / recettes associés
     results = (
         session.query(
             cook.Recipe.recipe_id,
@@ -77,6 +82,8 @@ def generate_kmeans_ingredient(session, nb_cluster):
         )
         .join(cook.recipe_ingredient, cook.Recipe.recipe_id == cook.recipe_ingredient.c.recipe_id)
         .join(cook.Ingredient, cook.recipe_ingredient.c.ingredient_id == cook.Ingredient.ingredient_id)
+        .join(cook.Recipe, cook.recipe_ingredient.c.recipe_id == cook.Recipe.recipe_id)
+        .where(cook.Recipe.n_ingredients > 3 and cook.Ingredient.)
         .group_by(cook.Recipe.recipe_id)
         .all()
     )
@@ -87,20 +94,30 @@ def generate_kmeans_ingredient(session, nb_cluster):
             for result in results]
     )
 
+    print(df_recipes_ingredients['ingredients'])
+    print(df_recipes_ingredients['ingredients'].apply(lambda x: ', '.join(x)))
     # Avec CountVectorizer car tfidf dimunue les mots les plus fréquents
-    count_vectorizer = CountVectorizer()
-    X_count = count_vectorizer.fit_transform(
-        df_recipes_ingredients['ingredients'].apply(lambda x: ', '.join(x))
-    )
+    vectorizer = CountVectorizer(tokenizer=lambda x: x.split(', '))
+    # Transpose pour avoir ingrédients en lignes
+    X_count = vectorizer.fit_transform(
+        df_recipes_ingredients['ingredients'].apply(lambda x: ', '.join(x))).T
+    # Obtenir les noms des ingrédients
+    ingredient_names = vectorizer.get_feature_names_out()
 
-    kmeans_count = KMeans(n_clusters=nb_cluster, random_state=42)
-    df_recipes_ingredients['cluster_count'] = kmeans_count.fit_predict(X_count)
+    # Clusterisation avec KMeans des ingrédients (chaque ligne est un ingrédient)
+    kmeans = KMeans(n_clusters=3, random_state=42)
+    clusters = kmeans.fit_predict(X_count)
 
+    # Création d'un DataFrame pour stocker les résultats de clusterisation
+    df_ingredients_clusters = pd.DataFrame({
+        'ingredient': ingredient_names,
+        'cluster': clusters
+    })
 
-# Réduction de dimension avec PCA pour visualisation
+    # Réduction de dimension avec PCA pour visualisation
     pca = PCA(n_components=2)
     X_pca = pca.fit_transform(X_count.toarray())
-    df_recipes_ingredients['pca_x'] = X_pca[:, 0]
-    df_recipes_ingredients['pca_y'] = X_pca[:, 1]
+    df_ingredients_clusters['pca_x'] = X_pca[:, 0]
+    df_ingredients_clusters['pca_y'] = X_pca[:, 1]
 
-    return df_recipes_ingredients
+    return df_ingredients_clusters
