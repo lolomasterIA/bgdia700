@@ -42,45 +42,39 @@ if __name__ == "__main__":
     logger.info("Application started")
     # ... votre code ...
 
-    nb_recipes_by_ingredient = backend.recipe_number_ingredient(session)
-    nombre_ingredients = list(nb_recipes_by_ingredient.keys())
-    nombre_recettes = list(nb_recipes_by_ingredient.values())
-
-    total_ingredient = len(cook.Ingredient.get_all(session))
-    total_recettes = sum(nombre_recettes)
-
-    top_ingredient_used = backend.top_ingredient_used(session, 10)
-    df_top_ingredient_used = pd.DataFrame(top_ingredient_used)
-    df_top_ingredient_used = df_top_ingredient_used.rename(columns={"name": "Ingrédient",
-                                                                    "recipe_count": "Nombre de recettes"})
-
-    ingredient_total_rating, ingredient_review_count = backend.top_ingredient_rating(
-        session)
-
-    df_ingredient_review_count = pd.DataFrame(
-        list(ingredient_review_count.items()), columns=['Ingrédient', 'nb reviews'])
-
-    # à retravailler car le rating est complexe à appréhender...
-    df_ingredient_total_rating = pd.DataFrame(
-        list(ingredient_total_rating.items()), columns=['Ingrédient', 'Moyenne rating'])
-
-    # On essait de supprimer les recette qui ont moins de 10 reviews
-    df_ingredient_total_rating1 = pd.merge(df_ingredient_total_rating,
-                                           df_ingredient_review_count, on="Ingrédient")
-    df_ingredient_total_rating1 = df_ingredient_total_rating1[(
-        df_ingredient_total_rating1['nb reviews'] > 20)]
-
-    # On essait de supprimer les recette qui ont un rating = 5 exactement
-    df_ingredient_total_rating2 = df_ingredient_total_rating1[
-        df_ingredient_total_rating1['Moyenne rating'] < 5]
-
-    # on joint les 2 dataframes, nb review et nb recette car ce sont les même
-    df_top_ingredient_used = pd.merge(
-        df_top_ingredient_used, df_ingredient_review_count.head(10), on='Ingrédient', how='inner')
-
-    menu, col1, col2, col3, col4 = frontend.generate_layout()
+    menu, col1, col2, col3, col4, col5, col6 = frontend.generate_layout()
 
     if menu == "Généralité":
+        nb_recipes_by_ingredient = backend.recipe_number_ingredient(session)
+        nombre_ingredients = list(nb_recipes_by_ingredient.keys())
+        nombre_recettes = list(nb_recipes_by_ingredient.values())
+
+        total_ingredient = len(cook.Ingredient.get_all(session))
+        total_recettes = sum(nombre_recettes)
+
+        top_ingredient_used = backend.top_ingredient_used(session, 10)
+        df_top_ingredient_used = pd.DataFrame(top_ingredient_used)
+        df_top_ingredient_used = df_top_ingredient_used.rename(columns={"name": "Ingrédient",
+                                                                        "recipe_count": "Nombre de recettes"})
+
+        ingredient_total_rating, ingredient_review_count = backend.top_ingredient_rating(
+            session)
+
+        df_ingredient_review_count = pd.DataFrame(
+            list(ingredient_review_count.items()), columns=['Ingrédient', 'nb reviews'])
+
+        # à retravailler car le rating est complexe à appréhender...
+        df_ingredient_total_rating = pd.DataFrame(
+            list(ingredient_total_rating.items()), columns=['Ingrédient', 'Moyenne rating'])
+        df_ingredient_total_rating_count = pd.merge(df_ingredient_total_rating,
+                                                    df_ingredient_review_count, on="Ingrédient")
+
+        # on joint les 2 dataframes, nb review et nb recette car ce sont les même
+        df_top_ingredient_used = pd.merge(
+            df_top_ingredient_used, df_ingredient_review_count.head(10), on='Ingrédient', how='inner')
+
+        nb_ing = len(df_ingredient_total_rating_count)
+
         with col1:
             styled_top_10 = df_top_ingredient_used.style.highlight_max(axis=0, color="lightgreen").highlight_min(
                 axis=0, color="lightcoral").format({"Nombre": "{:.1f}%"})
@@ -107,21 +101,45 @@ if __name__ == "__main__":
             st.plotly_chart(fig, use_container_width=True)
 
         with col3:
-            styled_top_10 = df_ingredient_total_rating1.head(10).style.highlight_max(axis=0, color="lightgreen").highlight_min(
-                axis=0, color="lightcoral").format({"Nombre": "{:.1f}%"})
-            st.subheader(
-                "Top 10 des ingrédients avec le meilleur rating (nb > 20)")
-            st.dataframe(styled_top_10, use_container_width=True)
-
-        with col4:
+            st.subheader("Top 10 des ingrédients avec le meilleur rating")
+            col41, col42 = st.columns(2)
+            with col41:
+                min_reviews = st.slider(
+                    "Nombre minimum de reviews", min_value=0, max_value=500, value=20, step=1)
+            with col42:
+                max_rating = st.slider(
+                    "Valeur maximale de rating", min_value=0.0, max_value=5.1, value=5.0, step=0.1)
+            # On supprime les recettes qui ont moins de min_reviews reviews et moins de max_rating rating
+            df_ingredient_total_rating1 = df_ingredient_total_rating_count[(
+                df_ingredient_total_rating_count['nb reviews'] > min_reviews)]
+            df_ingredient_total_rating2 = df_ingredient_total_rating1[
+                df_ingredient_total_rating1['Moyenne rating'] < max_rating]
             styled_top_10 = df_ingredient_total_rating2.head(10).style.highlight_max(axis=0, color="lightgreen").highlight_min(
                 axis=0, color="lightcoral").format({"Nombre": "{:.1f}%"})
-            st.subheader(
-                "Top 10 des ingrédients avec le meilleur rating (note < 5)")
             st.dataframe(styled_top_10, use_container_width=True)
+        with col4:
+            # ingrédients selon moyenne de rating et nombre de rating
+            st.subheader("ingrédients selon le rating et le nombre de reviews")
+            nb_ing = len(df_ingredient_total_rating2)
+            st.text("Nombre d'ingrédient : " + str(nb_ing))
+            fig = px.scatter(
+                df_ingredient_total_rating2,
+                x="nb reviews",
+                y="Moyenne rating",
+                labels={
+                    "nb reviews": "Nombre de reviews",
+                    "Moyenne rating": "Évaluation moyenne (rating)"
+                },
+            )
+            fig.update_traces(textposition='top center')
+            st.plotly_chart(fig, use_container_width=True)
 
-    elif menu == "Page 2":
+    elif menu == "Clusterisation":
         with col1:
+            st.subheader("Kmeans sur les ingredients dans les recettes")
+            st.text("Filtres : ")
+            st.text("Nombre de recettes après filtres : ")
+            st.text("Nombre d'ingrédients après filtres : ")
             df = backend.generate_kmeans_ingredient(session, 3)
             frontend.display_kmeans_ingredient(df)
 

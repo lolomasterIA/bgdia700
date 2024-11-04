@@ -19,7 +19,7 @@ def generate_layout():
     # Titre principal de l'application
     st.image("src/frontend/images/mangetamain.jpg", use_column_width=True)
 
-    menu = st.selectbox("", ["Généralité", "Page 2", "Page 3"])
+    menu = st.selectbox("", ["Généralité", "Clusterisation", "Page 3"])
 
     # Zone principale de contenu
     st.header(menu)
@@ -31,20 +31,21 @@ def generate_layout():
     with st.container():
         col3, col4 = st.columns(2)
 
+    with st.container():
+        col5, col6 = st.columns(2)
+
     # Footer ou informations supplémentaires
     st.markdown("---")
     st.text("powered by Telecom Paris Master IA")
 
-    return menu, col1, col2, col3, col4
+    return menu, col1, col2, col3, col4, col5, col6
 
 
 ### Travaux sur les ingrédients ###
 def display_kmeans_ingredient(df_recipes_ingredients):
     # Affichage des clusters sous forme de graphique
-    st.title("Visualisation des clusters de recettes")
-    st.write("Voici les clusters obtenus à partir des ingrédients des recettes:")
-    fig = px.scatter(df_recipes_ingredients, x='pca_x', y='pca_y', color='cluster_count',
-                     hover_data=['id_recipe', 'ingredients'], title="Cluster des recettes en fonction des ingrédients")
+    fig = px.scatter(df_recipes_ingredients, x='pca_x', y='pca_y', color='cluster',
+                     hover_data=['ingredient'], title="Cluster des ingrédients en fonction des recettes")
     st.plotly_chart(fig)
 
 

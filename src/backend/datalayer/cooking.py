@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Text, TIMESTAMP, ForeignKey, Table, PrimaryKeyConstraint
+from sqlalchemy import create_engine, Column, Integer, String, Text, Float, TIMESTAMP, ForeignKey, Table, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base, joinedload
 from dotenv import load_dotenv
 import os
@@ -144,6 +144,8 @@ class Recipe(Base, BaseModel):
     n_steps = Column(Integer)
     steps = Column(Text)
     n_ingredients = Column(Integer)
+    nb_rating = Column(Integer)
+    avg_rating = Column(Float)
 
     # Relation avec Contributor via la table contributor_recipe
     contributors = relationship(
@@ -189,6 +191,7 @@ class Ingredient(Base, BaseModel):
 
     ingredient_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), unique=True)
+    nb_recette = Column(Integer)
 
     # Relation avec Recipe via la table recipe_ingredient (table déjà existante)
     recipes = relationship(

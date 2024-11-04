@@ -82,9 +82,8 @@ def generate_kmeans_ingredient(session, nb_cluster):
         )
         .join(cook.recipe_ingredient, cook.Recipe.recipe_id == cook.recipe_ingredient.c.recipe_id)
         .join(cook.Ingredient, cook.recipe_ingredient.c.ingredient_id == cook.Ingredient.ingredient_id)
-        .join(cook.Recipe, cook.recipe_ingredient.c.recipe_id == cook.Recipe.recipe_id)
-        .where(cook.Recipe.n_ingredients > 3 and cook.Ingredient.)
         .group_by(cook.Recipe.recipe_id)
+        .where((cook.Recipe.nb_rating > 20) & (cook.Recipe.n_ingredients > 3) & (cook.Ingredient.nb_recette > 5))
         .all()
     )
 
@@ -95,7 +94,7 @@ def generate_kmeans_ingredient(session, nb_cluster):
     )
 
     print(df_recipes_ingredients['ingredients'])
-    print(df_recipes_ingredients['ingredients'].apply(lambda x: ', '.join(x)))
+    print(len(df_recipes_ingredients['ingredients']))
     # Avec CountVectorizer car tfidf dimunue les mots les plus fréquents
     vectorizer = CountVectorizer(tokenizer=lambda x: x.split(', '))
     # Transpose pour avoir ingrédients en lignes
