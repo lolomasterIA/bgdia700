@@ -19,10 +19,10 @@ import plotly.express as px
 load_dotenv()
 
 # Connexion à la base de données PostgreSQL cooking
-DB_USER = os.getenv('DB_USER')
-DB_PASS = os.getenv('DB_PASS')
-DB_HOST = os.getenv('DB_HOST')
-DB_NAME = os.getenv('DB_NAME')
+DB_USER = os.getenv("DB_USER")
+DB_PASS = os.getenv("DB_PASS")
+DB_HOST = os.getenv("DB_HOST")
+DB_NAME = os.getenv("DB_NAME")
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:5432/{DB_NAME}"
 engine = create_engine(DATABASE_URL)
 Base = declarative_base()
@@ -54,44 +54,58 @@ if __name__ == "__main__":
 
         top_ingredient_used = backend.top_ingredient_used(session, 10)
         df_top_ingredient_used = pd.DataFrame(top_ingredient_used)
-        df_top_ingredient_used = df_top_ingredient_used.rename(columns={"name": "Ingrédient",
-                                                                        "recipe_count": "Nombre de recettes"})
+        df_top_ingredient_used = df_top_ingredient_used.rename(
+            columns={"name": "Ingrédient", "recipe_count": "Nombre de recettes"}
+        )
 
-        ingredient_total_rating, ingredient_review_count = backend.top_ingredient_rating(
-            session)
+        ingredient_total_rating, ingredient_review_count = (
+            backend.top_ingredient_rating(session)
+        )
 
         df_ingredient_review_count = pd.DataFrame(
-            list(ingredient_review_count.items()), columns=['Ingrédient', 'nb reviews'])
+            list(ingredient_review_count.items()), columns=["Ingrédient", "nb reviews"]
+        )
 
         # à retravailler car le rating est complexe à appréhender...
         df_ingredient_total_rating = pd.DataFrame(
-            list(ingredient_total_rating.items()), columns=['Ingrédient', 'Moyenne rating'])
-        df_ingredient_total_rating_count = pd.merge(df_ingredient_total_rating,
-                                                    df_ingredient_review_count, on="Ingrédient")
+            list(ingredient_total_rating.items()),
+            columns=["Ingrédient", "Moyenne rating"],
+        )
+        df_ingredient_total_rating_count = pd.merge(
+            df_ingredient_total_rating, df_ingredient_review_count, on="Ingrédient"
+        )
 
         # on joint les 2 dataframes, nb review et nb recette car ce sont les même
         df_top_ingredient_used = pd.merge(
-            df_top_ingredient_used, df_ingredient_review_count.head(10), on='Ingrédient', how='inner')
+            df_top_ingredient_used,
+            df_ingredient_review_count.head(10),
+            on="Ingrédient",
+            how="inner",
+        )
 
         nb_ing = len(df_ingredient_total_rating_count)
 
         with col1:
-            styled_top_10 = df_top_ingredient_used.style.highlight_max(axis=0, color="lightgreen").highlight_min(
-                axis=0, color="lightcoral").format({"Nombre": "{:.1f}%"})
+            styled_top_10 = (
+                df_top_ingredient_used.style.highlight_max(axis=0, color="lightgreen")
+                .highlight_min(axis=0, color="lightcoral")
+                .format({"Nombre": "{:.1f}%"})
+            )
             st.subheader(
-                "Top 10 des ingrédients (total : " + str(total_ingredient) + ")")
+                "Top 10 des ingrédients (total : " + str(total_ingredient) + ")"
+            )
             st.dataframe(styled_top_10, use_container_width=True)
 
         with col2:
             # Créer le graphique en barres avec Plotly
             st.subheader(
-                "Nb recettes (total : " + str(total_recettes) + ") / nb ingrédients")
+                "Nb recettes (total : " + str(total_recettes) + ") / nb ingrédients"
+            )
             fig = px.bar(
                 x=nombre_ingredients,
                 y=nombre_recettes,
-                labels={"x": "Nombre d'ingrédients",
-                        "y": "Nombre de recettes"},
-                title="Nombre de recettes en fonction du nombre d'ingrédients"
+                labels={"x": "Nombre d'ingrédients", "y": "Nombre de recettes"},
+                title="Nombre de recettes en fonction du nombre d'ingrédients",
             )
 
             # Ajuster l'axe X pour afficher tous les deux chiffres
@@ -105,17 +119,33 @@ if __name__ == "__main__":
             col41, col42 = st.columns(2)
             with col41:
                 min_reviews = st.slider(
-                    "Nombre minimum de reviews", min_value=0, max_value=500, value=20, step=1)
+                    "Nombre minimum de reviews",
+                    min_value=0,
+                    max_value=500,
+                    value=20,
+                    step=1,
+                )
             with col42:
                 max_rating = st.slider(
-                    "Valeur maximale de rating", min_value=0.0, max_value=5.1, value=5.0, step=0.1)
+                    "Valeur maximale de rating",
+                    min_value=0.0,
+                    max_value=5.1,
+                    value=5.0,
+                    step=0.1,
+                )
             # On supprime les recettes qui ont moins de min_reviews reviews et moins de max_rating rating
-            df_ingredient_total_rating1 = df_ingredient_total_rating_count[(
-                df_ingredient_total_rating_count['nb reviews'] > min_reviews)]
+            df_ingredient_total_rating1 = df_ingredient_total_rating_count[
+                (df_ingredient_total_rating_count["nb reviews"] > min_reviews)
+            ]
             df_ingredient_total_rating2 = df_ingredient_total_rating1[
-                df_ingredient_total_rating1['Moyenne rating'] < max_rating]
-            styled_top_10 = df_ingredient_total_rating2.head(10).style.highlight_max(axis=0, color="lightgreen").highlight_min(
-                axis=0, color="lightcoral").format({"Nombre": "{:.1f}%"})
+                df_ingredient_total_rating1["Moyenne rating"] < max_rating
+            ]
+            styled_top_10 = (
+                df_ingredient_total_rating2.head(10)
+                .style.highlight_max(axis=0, color="lightgreen")
+                .highlight_min(axis=0, color="lightcoral")
+                .format({"Nombre": "{:.1f}%"})
+            )
             st.dataframe(styled_top_10, use_container_width=True)
         with col4:
             # ingrédients selon moyenne de rating et nombre de rating
@@ -128,10 +158,10 @@ if __name__ == "__main__":
                 y="Moyenne rating",
                 labels={
                     "nb reviews": "Nombre de reviews",
-                    "Moyenne rating": "Évaluation moyenne (rating)"
+                    "Moyenne rating": "Évaluation moyenne (rating)",
                 },
             )
-            fig.update_traces(textposition='top center')
+            fig.update_traces(textposition="top center")
             st.plotly_chart(fig, use_container_width=True)
 
     elif menu == "Clusterisation":
@@ -144,5 +174,4 @@ if __name__ == "__main__":
             frontend.display_kmeans_ingredient(df)
 
     elif menu == "Page 3":
-        st.subheader(
-            "page 3")
+        st.subheader("page 3")

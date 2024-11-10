@@ -1,3 +1,5 @@
+"""Le coeur de l'application, s'appuie sur le front et le back."""
+
 from src.logging_config import setup_logging
 import streamlit as st
 import numpy as np
@@ -19,10 +21,10 @@ import src.frontend.frontend as frontend
 load_dotenv()
 
 # Connexion à la base de données PostgreSQL cooking
-DB_USER = os.getenv('DB_USER')
-DB_PASS = os.getenv('DB_PASS')
-DB_HOST = os.getenv('DB_HOST')
-DB_NAME = os.getenv('DB_NAME')
+DB_USER = os.getenv("DB_USER")
+DB_PASS = os.getenv("DB_PASS")
+DB_HOST = os.getenv("DB_HOST")
+DB_NAME = os.getenv("DB_NAME")
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:5432/{DB_NAME}"
 engine = create_engine(DATABASE_URL)
 Base = declarative_base()
@@ -33,12 +35,12 @@ session = Session()
 logger = setup_logging()
 
 recettes = cook.Recipe.get_all(session, n_ingredients=7)
-   ingredients = pd.DataFrame()
-   for recette in recettes:
-        for ingredient in recette.ingredients:
-            ingredients.add(ingredient)
-    print(len(recettes))
-    print(recettes.to_dataframe()["steps"])
+ingredients = pd.DataFrame()
+for recette in recettes:
+    for ingredient in recette.ingredients:
+        ingredients.add(ingredient)
+print(len(recettes))
+print(recettes.to_dataframe()["steps"])
 """
     # réduire la taille du jeu de données Recettes / ingrédients
     reducedRecettes = cook.Recipe

@@ -1,88 +1,87 @@
 #Actions de validation lors d'un push ou d'une pull request sur le repo :
 
-name: tests et validation avant ajout sur la branche main
+  name: tests et validation avant ajout sur la branche main
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  on:
+    push:
+      branches:
+        - main
+        - Hugo
+    pull_request:
+      branches:
+        - main
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-  
-jobs:
-  build:
-    runs-on: ubuntu-latest
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
 
-    strategy:
-      matrix:
-        python-version: [3.11]
+  jobs:
+    build:
+      runs-on: ubuntu-latest
 
-    steps:
-    # Étape 1 : Cloner le dépôt
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      strategy:
+        matrix:
+          python-version: [3.11]
 
-    # Étape 2 : Installer Python
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
+      steps:
+      # Étape 1 : Cloner le dépôt
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    # Étape 3.1 : Installer Poetry
-    - name: Install Poetry
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
+      # Étape 2 : Installer Python
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    # Étape 3.2 : Installer outil de validation
-    - name: Install tools
-      run: |
-        pip install black
-        pip install flake8
-        pip install pydocstyle
-        pip install bandit
-        pip install pytest
-        pip install pytest-cov
+      # Étape 3.1 : Installer Poetry
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
 
-    # Étape 4 : Installer les dépendances du projet via Poetry
-    - name: Install dependencies with Poetry
-      run: |
-        poetry install
-    
-    # Étape 5 : Formater le code avec black
-    - name: Format code with black
-      run: |
-        poetry run black .
+      # Étape 3.2 : Installer outil de validation
+      - name: Install tools
+        run: |
+          pip install black
+          pip install flake8
+          pip install pydocstyle
+          pip install bandit
+          pip install pytest
+          pip install pytest-cov
 
-    # Étape 5 : Vérifier la conformité PEP8 avec flake8
-    - name: Check code style (PEP8) with flake8
-      run: |
-        poetry run flake8 . --ignore=E501
+      # Étape 4 : Installer les dépendances du projet via Poetry
+      - name: Install dependencies with Poetry
+        run: |
+          poetry install
 
-    # Étape 6 : Vérifier la documentation et les commentaires avec pydocstyle
-    - name: Check documentation with pydocstyle
-      run: |
-        poetry run pydocstyle . --ignore=D104,D203,D212,D400
+      # Étape 5 : Formater le code avec black
+      - name: Format code with black
+        run: |
+          poetry run black .
 
-    # Étape 7 : Vérifier les bonnes pratiques de sécurité et de gestion des exceptions avec bandit
-    - name: Security check and exception handling (log) with bandit
-      run: |
-        poetry run bandit -r . -x ./tests/
+      # Étape 5 : Vérifier la conformité PEP8 avec flake8
+      - name: Check code style (PEP8) with flake8
+        run: |
+          poetry run flake8 . --ignore=E266,E501,F401,W503
 
-    # Étape 8 : Exécuter les tests unitaires
-    - name: Run unit tests with pytest
-      run: |
-        poetry run pytest --cov=src --cov-report=xml
-      env:
-        # Configuration pour s'assurer que la couverture est suffisante
-        PYTEST_ADDOPTS: "--maxfail=1 --disable-warnings"
+      # Étape 6 : Vérifier la documentation et les commentaires avec pydocstyle
+      - name: Check documentation with pydocstyle
+        run: |
+          poetry run pydocstyle . --ignore=D104,D200,D202,D203,D212,D400,D413
 
-    # Étape 9 : Vérifier les dépendances obsolètes
-    #- name: Check for outdated dependencies
-    #  run: |
-    #    poetry update --dry-run
-    
+      # Étape 7 : Vérifier les bonnes pratiques de sécurité et de gestion des exceptions avec bandit
+      - name: Security check and exception handling (log) with bandit
+        run: |
+          poetry run bandit -r . -x ./tests/
 
+      # Étape 8 : Exécuter les tests unitaires
+      - name: Run unit tests with pytest
+        run: |
+          poetry run pytest --cov=src --cov-report=xml
+        env:
+          # Configuration pour s'assurer que la couverture est suffisante
+          PYTEST_ADDOPTS: "--maxfail=1 --disable-warnings"
+
+      # Étape 9 : Vérifier les dépendances obsolètes
+      #- name: Check for outdated dependencies
+      #  run: |
+      #    poetry update --dry-run

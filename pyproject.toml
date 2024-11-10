@@ -13,18 +13,21 @@ python = "^3.11"
 pandas = "^2.2.3"
 python-dotenv = "^1.0.1"
 pytest = "^8.3.3"
-psycopg2 = "^2.9.10"
+psycopg2-binary = "^2.9.10"
 sqlalchemy = "^2.0.36"
 streamlit = "^1.39.0"
 plotly = "^5.24.1"
-
 
 [tool.poetry.group.dev.dependencies]
 pytest-cov = "^5.0.0"
 black = "^24.10.0"
 pydocstyle = "^6.3.0"
 flake8 = "^7.1.1"
+pre-commit = "^4.0.1"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.bandit]
+exclude_dirs = ["tests"]
