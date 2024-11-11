@@ -10,6 +10,12 @@ import plotly.express as px
 
 
 def generate_layout():
+    """
+    Configure et génère la mise en page principale de l'application Streamlit.
+
+    Retourne:
+    - tuple : Contient le menu sélectionné et les objets de colonne pour structurer le contenu dans des sections.
+    """
     # Configurer la page pour un affichage en pleine largeur
     st.set_page_config(
         page_title="Mange ta main",
@@ -26,7 +32,10 @@ def generate_layout():
 
     # Utilisation des colonnes pour diviser la zone centrale en plusieurs sections
     with st.container():
-        col1, col2 = st.columns(2)
+        if menu == "Clusterisation":
+            col1, col2 = st.columns([1, 2])
+        else:
+            col1, col2 = st.columns(2)
 
     with st.container():
         col3, col4 = st.columns(2)
@@ -42,23 +51,25 @@ def generate_layout():
 
 
 ### Travaux sur les ingrédients ###
-def display_kmeans_ingredient(df_recipes_ingredients):
-    # Affichage des clusters sous forme de graphique
+def display_kmeans_recipe(df_recipes_ingredients):
+    """
+    Affiche les clusters d'ingrédients en fonction des recettes sous forme de graphique interactif.
+    Paramètres:
+    - df_recipes_ingredients : DataFrame contenant les informations de clusterisation et les coordonnées PCA.
+    Cette fonction génère un graphique de dispersion où chaque point représente un ingrédient, coloré selon le cluster.
+    """
     fig = px.scatter(df_recipes_ingredients, x='pca_x', y='pca_y', color='cluster',
-                     hover_data=['ingredient'], title="Cluster des ingrédients en fonction des recettes")
+                     hover_data=['recette'], title="Cluster des ingrédients en fonction des recettes")
     st.plotly_chart(fig)
 
 
-"""
-    # Visualisation avec Matplotlib
-    plt.figure(figsize=(10, 6))
-    for cluster in df_recipes_ingredients['cluster_count'].unique():
-        cluster_data = df_recipes_ingredients[df_recipes_ingredients['cluster_count'] == cluster]
-        plt.scatter(cluster_data['pca_x'],
-                    cluster_data['pca_y'], label=f'Cluster {cluster}')
-
-    plt.xlabel("PCA Component 1")
-    plt.ylabel("PCA Component 2")
-    plt.title("Cluster des recettes en fonction des ingrédients")
-    plt.legend()
-    st.pyplot(plt)"""
+def display_kmeans_ingredient(df_recipes_ingredients):
+    """
+    Affiche les clusters d'ingrédients en fonction des recettes sous forme de graphique interactif.
+    Paramètres:
+    - df_recipes_ingredients : DataFrame contenant les informations de clusterisation et les coordonnées PCA.
+    Cette fonction génère un graphique de dispersion où chaque point représente un ingrédient, coloré selon le cluster.
+    """
+    fig = px.scatter(df_recipes_ingredients, x='x', y='y', color='cluster',
+                     hover_data=['ingredient'], title="Cluster des ingrédients en fonction des recettes")
+    st.plotly_chart(fig)

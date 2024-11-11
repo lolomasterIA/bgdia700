@@ -45,25 +45,29 @@ if __name__ == "__main__":
     menu, col1, col2, col3, col4, col5, col6 = frontend.generate_layout()
 
     if menu == "Généralité":
+        # Affichage des statistiques générales sur les recettes et ingrédients
+
+        # Récupérer le nombre de recettes par nombre d'ingrédients
         nb_recipes_by_ingredient = backend.recipe_number_ingredient(session)
         nombre_ingredients = list(nb_recipes_by_ingredient.keys())
         nombre_recettes = list(nb_recipes_by_ingredient.values())
 
+        # Obtenir le nombre total d'ingrédients et de recettes
         total_ingredient = len(cook.Ingredient.get_all(session))
         total_recettes = sum(nombre_recettes)
 
+        # Top 10 des ingrédients les plus utilisés dans les recettes
         top_ingredient_used = backend.top_ingredient_used(session, 10)
         df_top_ingredient_used = pd.DataFrame(top_ingredient_used)
         df_top_ingredient_used = df_top_ingredient_used.rename(columns={"name": "Ingrédient",
                                                                         "recipe_count": "Nombre de recettes"})
 
+        # Notes moyennes et nombre de reviews pour chaque ingrédient
         ingredient_total_rating, ingredient_review_count = backend.top_ingredient_rating(
             session)
 
         df_ingredient_review_count = pd.DataFrame(
             list(ingredient_review_count.items()), columns=['Ingrédient', 'nb reviews'])
-
-        # à retravailler car le rating est complexe à appréhender...
         df_ingredient_total_rating = pd.DataFrame(
             list(ingredient_total_rating.items()), columns=['Ingrédient', 'Moyenne rating'])
         df_ingredient_total_rating_count = pd.merge(df_ingredient_total_rating,
@@ -76,6 +80,7 @@ if __name__ == "__main__":
         nb_ing = len(df_ingredient_total_rating_count)
 
         with col1:
+            # Affichage du top 10 des ingrédients les plus utilisés
             styled_top_10 = df_top_ingredient_used.style.highlight_max(axis=0, color="lightgreen").highlight_min(
                 axis=0, color="lightcoral").format({"Nombre": "{:.1f}%"})
             st.subheader(
@@ -83,7 +88,7 @@ if __name__ == "__main__":
             st.dataframe(styled_top_10, use_container_width=True)
 
         with col2:
-            # Créer le graphique en barres avec Plotly
+            # Création d'un graphique en barres pour visualiser le nombre de recettes en fonction du nombre d'ingrédients
             st.subheader(
                 "Nb recettes (total : " + str(total_recettes) + ") / nb ingrédients")
             fig = px.bar(
@@ -93,14 +98,11 @@ if __name__ == "__main__":
                         "y": "Nombre de recettes"},
                 title="Nombre de recettes en fonction du nombre d'ingrédients"
             )
-
-            # Ajuster l'axe X pour afficher tous les deux chiffres
             fig.update_xaxes(dtick=2)
-
-            # Afficher le graphique dans Streamlit
             st.plotly_chart(fig, use_container_width=True)
 
         with col3:
+            # Affichage du top 10 des ingrédients avec le meilleur rating
             st.subheader("Top 10 des ingrédients avec le meilleur rating")
             col41, col42 = st.columns(2)
             with col41:
@@ -136,13 +138,42 @@ if __name__ == "__main__":
 
     elif menu == "Clusterisation":
         with col1:
-            st.subheader("Kmeans sur les ingredients dans les recettes")
-            st.text("Filtres : ")
-            st.text("Nombre de recettes après filtres : ")
-            st.text("Nombre d'ingrédients après filtres : ")
-            df = backend.generate_kmeans_ingredient(session, 3)
-            frontend.display_kmeans_ingredient(df)
+            nb_cluster = st.slider(
+                "Nombre de clusters", min_value=2, max_value=10, value=3, step=1)
+            st.text("Filtres:")
+            st.markdown("""
+                    - les recettes avec moins de 3 ingrédientss
+                    - les recettes avec moins de 20 reviews
+                    - les ingrédients qui apparaissent dans moins de 5 recettes
+                    - et les ingrédients / recettes associés""")
+            df, nombre_total_recettes, nombre_total_ingredients = backend.generate_kmeans_recipe(
+                session, nb_cluster)
+            st.text("Nombre de recettes après filtres : " +
+                    str(nombre_total_recettes))
+            st.text("Nombre d'ingrédients après filtres : " +
+                    str(nombre_total_ingredients))
+        with col2:
+            frontend.display_kmeans_recipe(df)
+        with col3:
+            nb_cluster2 = 5
+            reduced_data, all_ingredients, kmeans = backend.generate_kmeans_ingredient(
+                session, nb_cluster)
+            # Création d'un DataFrame pour Plotly
+            plot_data = pd.DataFrame(reduced_data, columns=[
+                'PCA Dimension 1', 'PCA Dimension 2'])
+            plot_data['ingredient'] = all_ingredients
+            plot_data['cluster'] = kmeans.labels_
 
+            # Visualisation avec Plotly
+            fig = px.scatter(
+                plot_data, x='PCA Dimension 1', y='PCA Dimension 2',
+                text='ingredient', color='cluster',
+                title='Clustering des ingrédients basés sur la co-occurrence'
+            )
+
+            fig.update_traces(textposition='top center')
+            fig.update_layout(legend_title_text='Cluster')
+            fig.show()
     elif menu == "Page 3":
         st.subheader(
             "page 3")

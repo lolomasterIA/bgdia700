@@ -25,7 +25,7 @@ session = Session()
 # Meta classe pour avoir des getters lisibles des objets
 class ObjectCollection:
     """
-    Pour convertire la collection d'objets en DataFrame.
+    Pour convertire la collection d'objets en DataFrame et pour itérer
     """
 
     def __init__(self, objects):
@@ -113,6 +113,9 @@ recipe_ingredient = Table(
 
 # Modèle Contributor
 class Contributor(Base, BaseModel):
+    """
+    Modèle de table Contributor avec relations pour la base de données.
+    """
     __tablename__ = 'contributor'
     contributor_id = Column(Integer, primary_key=True)
 
@@ -121,6 +124,9 @@ class Contributor(Base, BaseModel):
         'Recipe', secondary=contributor_recipe, back_populates='contributors')
 
     def __init__(self, session=None, id=None, **kwargs):
+        """
+        charge avec les attributs de la table Contributor et les recettes associées (objet recipe)
+        """
         if id and session:
             contributor = session.query(Contributor).options(joinedload(Contributor.recipes)).filter_by(
                 contributor_id=id).first()
@@ -134,6 +140,10 @@ class Contributor(Base, BaseModel):
 
 # Modèle Recipe
 class Recipe(Base, BaseModel):
+    """
+    Modèle de table Recipe avec relations pour la base de données.
+    En particulier, recipe à les ingrédients (objet ingredient) et les reviews (review) comme attribut
+    """
     __tablename__ = 'recipe'
 
     recipe_id = Column(Integer, primary_key=True)
@@ -187,6 +197,9 @@ class Recipe(Base, BaseModel):
 
 
 class Ingredient(Base, BaseModel):
+    """
+    Modèle de table Ingredient avec relations pour la base de données.
+    """
     __tablename__ = 'ingredient'
 
     ingredient_id = Column(Integer, primary_key=True, autoincrement=True)
@@ -209,10 +222,12 @@ class Ingredient(Base, BaseModel):
             for key, value in kwargs.items():
                 setattr(self, key, value)
 
+
 # Modèle Review
-
-
 class Review(Base, BaseModel):
+    """
+    Modèle de table Review avec relations pour la base de données.
+    """
     __tablename__ = 'review'
 
     review_id = Column(Integer, primary_key=True, autoincrement=True)
@@ -240,10 +255,12 @@ class Review(Base, BaseModel):
             for key, value in kwargs.items():
                 setattr(self, key, value)
 
+
 # Modèle Reviewer
-
-
 class Reviewer(Base, BaseModel):
+    """
+    Modèle de table Reviewer avec relations pour la base de données.
+    """
     __tablename__ = 'reviewer'
 
     reviewer_id = Column(Integer, primary_key=True)
