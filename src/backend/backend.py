@@ -17,18 +17,11 @@ from sqlalchemy import func
 ### Travaux sur les ingrédients ###
 def recipe_number_ingredient(session):
     """
-    Get the number of recipes for each number of ingredients from 1 to 40.
-
-    Parameters
-    ----------
-    session : Session
-        The database session used to query the recipes.
-
-    Returns
-    -------
-    dict
-        A dictionary where the keys are the number of ingredients (1 to 40)
-        and the values are the number of recipes with that number of ingredients.
+    Compte le nombre de recettes contenant un nombre spécifique d'ingrédients.
+    Paramètres:
+    - session : SQLAlchemy session pour la base de données.
+    Retourne:
+    - dict : Dictionnaire contenant le nombre de recettes pour chaque nombre d'ingrédients (jusqu'à 40).
     """
     recipe = dict()
     i = 1
@@ -40,23 +33,13 @@ def recipe_number_ingredient(session):
 
 def top_ingredient_used(session, n):
     """
-    Get the top n ingredients used in recipes.
-
-    Parameters
-    ----------
-    session : Session
-        The database session used to query the ingredients.
-    n : int
-        The number of top ingredients to return.
-
-    Returns
-    -------
-    list
-        A list of tuples where each tuple contains the ingredient name and the
-        number of recipes that use that ingredient, sorted in descending order
-        by the number of recipes.
+    Identifie les n ingrédients les plus utilisés dans les recettes.
+    Paramètres:
+    - session : SQLAlchemy session pour la base de données.
+    - n : Nombre d'ingrédients les plus utilisés à retourner.
+    Retourne:
+    - list : Liste des n ingrédients les plus utilisés avec leur nombre de recettes.
     """
-    # Requête pour compter le nombre de recettes par ingredient_id
     results = (
         session.query(
             cook.Ingredient.name,
@@ -79,21 +62,11 @@ def top_ingredient_used(session, n):
 
 def top_ingredient_rating(session):
     """
-    Get the average rating and review count for each ingredient.
-
-    Parameters
-    ----------
-    session : Session
-        The database session used to query the ingredients and reviews.
-
-    Returns
-    -------
-    tuple
-        A tuple containing two dictionaries:
-        - ingredient_average_rating (dict): A dictionary where the keys are ingredient names
-          and the values are the average ratings, sorted in descending order by average rating.
-        - ingredient_review_count (dict): A dictionary where the keys are ingredient names
-          and the values are the review counts, sorted in descending order by review count.
+    Récupère les ingrédients avec les meilleures notes moyennes et le plus de reviews.
+    Paramètres:
+    - session : SQLAlchemy session pour la base de données.
+    Retourne:
+    - tuple : Deux dictionnaires, un pour les notes moyennes et un pour le nombre de reviews par ingrédient.
     """
     results = (
         session.query(
@@ -132,36 +105,26 @@ def top_ingredient_rating(session):
 
 # Clusterisation des ingrédients
 # Création d'une matrice binaire (recette x ingrédient)
-def generate_kmeans_ingredient(session, nb_cluster):
+def generate_kmeans_recipe(session, nb_cluster):
     """
-    Generate K-means clusters based on ingredients in recipes.
+    Effectue une clusterisation des ingrédients en fonction de leur utilisation dans les recettes.
+    réduction du dataset, on enlève :
+    les recettes avec moins de 3 ingrédientss
+    les recettes avec moins de 20 reviews
+    les ingrédients qui apparaissent dans moins de 5 recettes
+    et les ingrédients / recettes associés
+    Paramètres:
+    - session : SQLAlchemy session pour la base de données.
+    - nb_cluster : Nombre de clusters pour la clusterisation.
 
-    This function reduces the dataset by removing:
-    - Recipes with less than 3 ingredients.
-    - Recipes with less than 20 reviews.
-    - Ingredients that appear in less than 5 recipes.
-    - Associated ingredients/recipes.
-
-    Parameters
-    ----------
-    session : Session
-        The database session used to query the recipes and ingredients.
-    nb_cluster : int
-        The number of clusters to generate.
-
-    Returns
-    -------
-    list
-        A list of results containing recipe IDs and aggregated ingredient names.
+    Retourne:
+    - pd.DataFrame : DataFrame contenant les recettes, les clusters, et les coordonnées PCA pour visualisation.
+    - le nombre de recette
+    - le nombre d'ingrédient
     """
-    # réduction du dataset, on enlève :
-    # les recettes avec moins de 3 ingrédientss
-    # les recettes avec moins de 20 reviews
-    # les ingrédients qui apparaissent dans moins de 5 recettes
-    # et les ingrédients / recettes associés
     results = (
         session.query(
-            cook.Recipe.recipe_id,
+            cook.Recipe.name,
             # Agréger les noms d'ingrédients dans une liste
             func.array_agg(cook.Ingredient.name).label("ingredients"),
         )
@@ -184,31 +147,32 @@ def generate_kmeans_ingredient(session, nb_cluster):
 
     # Conversion des résultats en un DataFrame
     df_recipes_ingredients = pd.DataFrame(
-        [
-            {"id_recipe": result.recipe_id, "ingredients": result.ingredients}
-            for result in results
-        ]
+        [{"id_recipe": result.name, "ingredients": result.ingredients}
+            for result in results]
     )
 
-    print(df_recipes_ingredients["ingredients"])
-    print(len(df_recipes_ingredients["ingredients"]))
-    # Avec CountVectorizer car tfidf dimunue les mots les plus fréquents
-    vectorizer = CountVectorizer(tokenizer=lambda x: x.split(", "))
-    # Transpose pour avoir ingrédients en lignes
-    X_count = vectorizer.fit_transform(
-        df_recipes_ingredients["ingredients"].apply(lambda x: ", ".join(x))
-    ).T
-    # Obtenir les noms des ingrédients
-    ingredient_names = vectorizer.get_feature_names_out()
+    # Nombre total de recettes
+    nombre_total_recettes = df_recipes_ingredients["id_recipe"].nunique()
+    # Nombre total d'ingrédients (en considérant les ingrédients uniques dans toutes les recettes)
+    nombre_total_ingredients = df_recipes_ingredients["ingredients"].explode(
+    ).nunique()
 
+    # Avec CountVectorizer car tfidf dimunue les mots les plus fréquents
+    vectorizer = CountVectorizer(tokenizer=lambda x: x.split(', '))
+    # Les recettes en lignes
+    X_count = vectorizer.fit_transform(
+        df_recipes_ingredients['ingredients'].apply(lambda x: ', '.join(x)))
+    # Obtenir les noms des ingrédients
+    # ingredient_names = vectorizer.get_feature_names_out()
     # Clusterisation avec KMeans des ingrédients (chaque ligne est un ingrédient)
-    kmeans = KMeans(n_clusters=3, random_state=42)
+    kmeans = KMeans(nb_cluster, random_state=42)
     clusters = kmeans.fit_predict(X_count)
 
     # Création d'un DataFrame pour stocker les résultats de clusterisation
-    df_ingredients_clusters = pd.DataFrame(
-        {"ingredient": ingredient_names, "cluster": clusters}
-    )
+    df_ingredients_clusters = pd.DataFrame({
+        'recette': df_recipes_ingredients["id_recipe"],
+        'cluster': clusters
+    })
 
     # Réduction de dimension avec PCA pour visualisation
     pca = PCA(n_components=2)
@@ -216,4 +180,71 @@ def generate_kmeans_ingredient(session, nb_cluster):
     df_ingredients_clusters["pca_x"] = X_pca[:, 0]
     df_ingredients_clusters["pca_y"] = X_pca[:, 1]
 
-    return df_ingredients_clusters
+    return df_ingredients_clusters, nombre_total_recettes, nombre_total_ingredients
+
+# Création d'une matrice de co occurrences (ingrédient x ingrédient)
+
+
+def generate_kmeans_ingredient(session, nb_cluster):
+    """
+    Effectue une clusterisation des ingrédients en fonction de leur utilisation dans les recettes.
+    réduction du dataset, on enlève :
+    les recettes avec moins de 3 ingrédientss
+    les recettes avec moins de 20 reviews
+    les ingrédients qui apparaissent dans moins de 5 recettes
+    et les ingrédients / recettes associés
+    Paramètres:
+    - session : SQLAlchemy session pour la base de données.
+    - nb_cluster : Nombre de clusters pour la clusterisation.
+
+    Retourne:
+    - pd.DataFrame : DataFrame contenant les ingrédients, les clusters, et les coordonnées PCA pour visualisation.
+    - le nombre de recette
+    - le nombre d'ingrédient
+    """
+    results = (
+        session.query(
+            cook.Recipe.recipe_id,
+            # Agréger les noms d'ingrédients dans une liste
+            func.array_agg(cook.Ingredient.name).label("ingredients")
+        )
+        .join(cook.recipe_ingredient, cook.Recipe.recipe_id == cook.recipe_ingredient.c.recipe_id)
+        .join(cook.Ingredient, cook.recipe_ingredient.c.ingredient_id == cook.Ingredient.ingredient_id)
+        .group_by(cook.Recipe.recipe_id)
+        .where((cook.Recipe.nb_rating > 20) & (cook.Recipe.n_ingredients > 3) & (cook.Ingredient.nb_recette > 5))
+        .all()
+    )
+
+    # Conversion des résultats en un DataFrame
+    df_recipes_ingredients = pd.DataFrame(
+        [{"id_recipe": result.recipe_id, "ingredients": result.ingredients}
+            for result in results]
+    )
+
+    # Extraction de tous les ingrédients uniques
+    all_ingredients = list(set(
+        ingredient for ingredients_list in df_recipes_ingredients['ingredients'] for ingredient in ingredients_list))
+
+    # Initialisation de la matrice de co-occurrence
+    co_occurrence_matrix = pd.DataFrame(
+        0, index=all_ingredients, columns=all_ingredients)
+
+    # Remplissage de la matrice en comptant les co-occurrences
+    for ingredients_list in df_recipes_ingredients['ingredients']:
+        for i in range(len(ingredients_list)):
+            for j in range(i + 1, len(ingredients_list)):
+                co_occurrence_matrix.loc[ingredients_list[i],
+                                         ingredients_list[j]] += 1
+                co_occurrence_matrix.loc[ingredients_list[j],
+                                         ingredients_list[i]] += 1
+
+    # Clustering avec KMeans basé sur la similarité cosinus
+    similarity_matrix = cosine_similarity(co_occurrence_matrix)
+    kmeans = KMeans(n_clusters=nb_cluster,
+                    random_state=0).fit(similarity_matrix)
+
+    # Visualisation des clusters après réduction de dimension
+    pca = PCA(n_components=2)
+    reduced_data = pca.fit_transform(similarity_matrix)
+
+    return reduced_data, all_ingredients, kmeans

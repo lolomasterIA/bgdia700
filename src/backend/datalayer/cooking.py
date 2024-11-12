@@ -42,7 +42,7 @@ session = Session()
 # Meta classe pour avoir des getters lisibles des objets
 class ObjectCollection:
     """
-    Pour convertire la collection d'objets en DataFrame.
+    Pour convertire la collection d'objets en DataFrame et pour itérer
     """
 
     def __init__(self, objects):
@@ -180,12 +180,9 @@ recipe_ingredient = Table(
 # Modèle Contributor
 class Contributor(Base, BaseModel):
     """
-    Model representing a contributor.
-
-    This class defines the attributes and relationships of a contributor.
+    Modèle de table Contributor avec relations pour la base de données.
     """
-
-    __tablename__ = "contributor"
+    __tablename__ = 'contributor'
     contributor_id = Column(Integer, primary_key=True)
 
     # Relation avec Recipe via la table contributor_recipe (table déjà existante dans la base de données)
@@ -195,16 +192,7 @@ class Contributor(Base, BaseModel):
 
     def __init__(self, session=None, id=None, **kwargs):
         """
-        Initialize a new instance of Contributor.
-
-        Parameters
-        ----------
-        session : Session, optional
-            The database session used to query the contributor.
-        id : int, optional
-            The ID of the contributor.
-        kwargs : dict
-            Additional attributes to set on the contributor.
+        charge avec les attributs de la table Contributor et les recettes associées (objet recipe)
         """
         if id and session:
             contributor = (
@@ -224,12 +212,10 @@ class Contributor(Base, BaseModel):
 # Modèle Recipe
 class Recipe(Base, BaseModel):
     """
-    Model representing a recipe.
-
-    This class defines the attributes and relationships of a recipe.
+    Modèle de table Recipe avec relations pour la base de données.
+    En particulier, recipe à les ingrédients (objet ingredient) et les reviews (review) comme attribut
     """
-
-    __tablename__ = "recipe"
+    __tablename__ = 'recipe'
 
     recipe_id = Column(Integer, primary_key=True)
     submitted = Column(TIMESTAMP)
@@ -315,12 +301,9 @@ class Recipe(Base, BaseModel):
 
 class Ingredient(Base, BaseModel):
     """
-    Model representing an ingredient.
-
-    This class defines the attributes and relationships of an ingredient.
+    Modèle de table Ingredient avec relations pour la base de données.
     """
-
-    __tablename__ = "ingredient"
+    __tablename__ = 'ingredient'
 
     ingredient_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), unique=True)
@@ -361,16 +344,11 @@ class Ingredient(Base, BaseModel):
 
 
 # Modèle Review
-
-
 class Review(Base, BaseModel):
     """
-    Model representing a review.
-
-    This class defines the attributes and relationships of a review.
+    Modèle de table Review avec relations pour la base de données.
     """
-
-    __tablename__ = "review"
+    __tablename__ = 'review'
 
     review_id = Column(Integer, primary_key=True, autoincrement=True)
     rating = Column(Integer)
@@ -420,16 +398,11 @@ class Review(Base, BaseModel):
 
 
 # Modèle Reviewer
-
-
 class Reviewer(Base, BaseModel):
     """
-    Model representing a reviewer.
-
-    This class defines the attributes and relationships of a reviewer.
+    Modèle de table Reviewer avec relations pour la base de données.
     """
-
-    __tablename__ = "reviewer"
+    __tablename__ = 'reviewer'
 
     reviewer_id = Column(Integer, primary_key=True)
 
