@@ -42,7 +42,7 @@ session = Session()
 # Meta classe pour avoir des getters lisibles des objets
 class ObjectCollection:
     """
-    Pour convertire la collection d'objets en DataFrame et pour itérer
+    Pour convertir la collection d'objets en DataFrame et pour itérer.
     """
 
     def __init__(self, objects):
@@ -182,7 +182,8 @@ class Contributor(Base, BaseModel):
     """
     Modèle de table Contributor avec relations pour la base de données.
     """
-    __tablename__ = 'contributor'
+
+    __tablename__ = "contributor"
     contributor_id = Column(Integer, primary_key=True)
 
     # Relation avec Recipe via la table contributor_recipe (table déjà existante dans la base de données)
@@ -192,7 +193,7 @@ class Contributor(Base, BaseModel):
 
     def __init__(self, session=None, id=None, **kwargs):
         """
-        charge avec les attributs de la table Contributor et les recettes associées (objet recipe)
+        Charge avec les attributs de la table Contributor et les recettes associées (objet recipe).
         """
         if id and session:
             contributor = (
@@ -213,9 +214,11 @@ class Contributor(Base, BaseModel):
 class Recipe(Base, BaseModel):
     """
     Modèle de table Recipe avec relations pour la base de données.
-    En particulier, recipe à les ingrédients (objet ingredient) et les reviews (review) comme attribut
+
+    En particulier, recipe à les ingrédients (objet ingredient) et les reviews (review) comme attribut.
     """
-    __tablename__ = 'recipe'
+
+    __tablename__ = "recipe"
 
     recipe_id = Column(Integer, primary_key=True)
     submitted = Column(TIMESTAMP)
@@ -303,7 +306,8 @@ class Ingredient(Base, BaseModel):
     """
     Modèle de table Ingredient avec relations pour la base de données.
     """
-    __tablename__ = 'ingredient'
+
+    __tablename__ = "ingredient"
 
     ingredient_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), unique=True)
@@ -348,7 +352,8 @@ class Review(Base, BaseModel):
     """
     Modèle de table Review avec relations pour la base de données.
     """
-    __tablename__ = 'review'
+
+    __tablename__ = "review"
 
     review_id = Column(Integer, primary_key=True, autoincrement=True)
     rating = Column(Integer)
@@ -402,7 +407,8 @@ class Reviewer(Base, BaseModel):
     """
     Modèle de table Reviewer avec relations pour la base de données.
     """
-    __tablename__ = 'reviewer'
+
+    __tablename__ = "reviewer"
 
     reviewer_id = Column(Integer, primary_key=True)
 

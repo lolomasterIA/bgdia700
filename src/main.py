@@ -64,11 +64,13 @@ if __name__ == "__main__":
         )
 
         # Notes moyennes et nombre de reviews pour chaque ingrédient
-        ingredient_total_rating, ingredient_review_count = backend.top_ingredient_rating(
-            session)
+        ingredient_total_rating, ingredient_review_count = (
+            backend.top_ingredient_rating(session)
+        )
 
         df_ingredient_review_count = pd.DataFrame(
-            list(ingredient_review_count.items()), columns=['Ingrédient', 'nb reviews'])
+            list(ingredient_review_count.items()), columns=["Ingrédient", "nb reviews"]
+        )
         df_ingredient_total_rating = pd.DataFrame(
             list(ingredient_total_rating.items()),
             columns=["Ingrédient", "Moyenne rating"],
@@ -89,8 +91,11 @@ if __name__ == "__main__":
 
         with col1:
             # Affichage du top 10 des ingrédients les plus utilisés
-            styled_top_10 = df_top_ingredient_used.style.highlight_max(axis=0, color="lightgreen").highlight_min(
-                axis=0, color="lightcoral").format({"Nombre": "{:.1f}%"})
+            styled_top_10 = (
+                df_top_ingredient_used.style.highlight_max(axis=0, color="lightgreen")
+                .highlight_min(axis=0, color="lightcoral")
+                .format({"Nombre": "{:.1f}%"})
+            )
             st.subheader(
                 "Top 10 des ingrédients (total : " + str(total_ingredient) + ")"
             )
@@ -164,40 +169,49 @@ if __name__ == "__main__":
     elif menu == "Clusterisation":
         with col1:
             nb_cluster = st.slider(
-                "Nombre de clusters", min_value=2, max_value=10, value=3, step=1)
+                "Nombre de clusters", min_value=2, max_value=10, value=3, step=1
+            )
             st.text("Filtres:")
-            st.markdown("""
+            st.markdown(
+                """
                     - les recettes avec moins de 3 ingrédientss
                     - les recettes avec moins de 20 reviews
                     - les ingrédients qui apparaissent dans moins de 5 recettes
-                    - et les ingrédients / recettes associés""")
-            df, nombre_total_recettes, nombre_total_ingredients = backend.generate_kmeans_recipe(
-                session, nb_cluster)
-            st.text("Nombre de recettes après filtres : " +
-                    str(nombre_total_recettes))
-            st.text("Nombre d'ingrédients après filtres : " +
-                    str(nombre_total_ingredients))
+                    - et les ingrédients / recettes associés"""
+            )
+            df, nombre_total_recettes, nombre_total_ingredients = (
+                backend.generate_kmeans_recipe(session, nb_cluster)
+            )
+            st.text("Nombre de recettes après filtres : " + str(nombre_total_recettes))
+            st.text(
+                "Nombre d'ingrédients après filtres : " + str(nombre_total_ingredients)
+            )
         with col2:
             frontend.display_kmeans_recipe(df)
         with col3:
             nb_cluster2 = 5
             reduced_data, all_ingredients, kmeans = backend.generate_kmeans_ingredient(
-                session, nb_cluster)
+                session, nb_cluster
+            )
             # Création d'un DataFrame pour Plotly
-            plot_data = pd.DataFrame(reduced_data, columns=[
-                'PCA Dimension 1', 'PCA Dimension 2'])
-            plot_data['ingredient'] = all_ingredients
-            plot_data['cluster'] = kmeans.labels_
+            plot_data = pd.DataFrame(
+                reduced_data, columns=["PCA Dimension 1", "PCA Dimension 2"]
+            )
+            plot_data["ingredient"] = all_ingredients
+            plot_data["cluster"] = kmeans.labels_
 
             # Visualisation avec Plotly
             fig = px.scatter(
-                plot_data, x='PCA Dimension 1', y='PCA Dimension 2',
-                text='ingredient', color='cluster',
-                title='Clustering des ingrédients basés sur la co-occurrence'
+                plot_data,
+                x="PCA Dimension 1",
+                y="PCA Dimension 2",
+                text="ingredient",
+                color="cluster",
+                title="Clustering des ingrédients basés sur la co-occurrence",
             )
 
-            fig.update_traces(textposition='top center')
-            fig.update_layout(legend_title_text='Cluster')
+            fig.update_traces(textposition="top center")
+            fig.update_layout(legend_title_text="Cluster")
             fig.show()
     elif menu == "Page 3":
         st.subheader("page 3")
