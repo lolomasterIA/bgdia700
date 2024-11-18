@@ -8,10 +8,10 @@ import src.backend.datalayer.cooking as cook
 import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.cluster import KMeans
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.decomposition import PCA
-from sqlalchemy import func
+from sklearn.cluster import KMeans, AgglomerativeClustering, DBSCAN
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.decomposition import PCA, TruncatedSVD
+from sqlalchemy import func, cast, Float
 
 
 ### Travaux sur les ingrédients ###
@@ -46,7 +46,8 @@ def top_ingredient_used(session, n):
     results = (
         session.query(
             cook.Ingredient.name,
-            func.count(cook.recipe_ingredient.c.recipe_id).label("recipe_count"),
+            func.count(cook.recipe_ingredient.c.recipe_id).label(
+                "recipe_count"),
         )
         .join(
             cook.recipe_ingredient,
@@ -57,7 +58,8 @@ def top_ingredient_used(session, n):
     )
 
     # Trier les résultats par nombre de recettes en ordre décroissant
-    nbingredientsrecettes_trie = sorted(results, key=lambda x: x[1], reverse=True)
+    nbingredientsrecettes_trie = sorted(
+        results, key=lambda x: x[1], reverse=True)
 
     # Récupérer les n premiers ingrédients
     return nbingredientsrecettes_trie[:n]
@@ -110,17 +112,22 @@ def top_ingredient_rating(session):
 
 # Clusterisation des ingrédients
 # Création d'une matrice binaire (recette x ingrédient)
-def generate_kmeans_recipe(session, nb_cluster):
+def generate_cluster_recipe(session, matrix_type="tfidf", reduction_type="pca", clustering_type="kmeans", n_components=2, nb_cluster=2):
     """
     Effectue une clusterisation des ingrédients en fonction de leur utilisation dans les recettes.
-
     réduction du dataset, on enlève :
     - les recettes avec moins de 3 ingrédients,
-    - les recettes avec moins de 20 reviews,
+    - les recettes avec moins de 15 reviews,
     - les ingrédients qui apparaissent dans moins de 5 recettes et les ingrédients / recettes associés.
 
     Paramètres:
     - session : SQLAlchemy session pour la base de données.
+    - matrix_type: Type de matrice à utiliser ("tfidf", "count").
+    - reduction_type: Réduction de dimensionnalité à appliquer ("pca", "svd").
+    - clustering_type: Algorithme de clusterisation à utiliser ("kmeans", "dbscan", "agglomerative").
+    - n_components: Nombre de dimensions pour la réduction.
+    - nb_cluster: Nombre de clusters (pour KMeans ou AgglomerativeClustering).
+    - n_components: Nombre de dimensions pour la réduction.
     - nb_cluster : Nombre de clusters pour la clusterisation.
 
     Retourne:
@@ -144,7 +151,7 @@ def generate_kmeans_recipe(session, nb_cluster):
         )
         .group_by(cook.Recipe.recipe_id)
         .where(
-            (cook.Recipe.nb_rating > 20)
+            (cook.Recipe.nb_rating > 15)
             & (cook.Recipe.n_ingredients > 3)
             & (cook.Ingredient.nb_recette > 5)
         )
@@ -162,19 +169,31 @@ def generate_kmeans_recipe(session, nb_cluster):
     # Nombre total de recettes
     nombre_total_recettes = df_recipes_ingredients["id_recipe"].nunique()
     # Nombre total d'ingrédients (en considérant les ingrédients uniques dans toutes les recettes)
-    nombre_total_ingredients = df_recipes_ingredients["ingredients"].explode().nunique()
+    nombre_total_ingredients = df_recipes_ingredients["ingredients"].explode(
+    ).nunique()
 
-    # Avec CountVectorizer car tfidf dimunue les mots les plus fréquents
-    vectorizer = CountVectorizer(tokenizer=lambda x: x.split(", "))
+    # Avec CountVectorizer et tfidf
+    if matrix_type == "tfidf":
+        vectorizer = TfidfVectorizer(tokenizer=lambda x: x.split(", "))
+    elif matrix_type == "count":
+        vectorizer = CountVectorizer(tokenizer=lambda x: x.split(", "))
+    else:
+        raise ValueError("Type de matrice non supporté.")
     # Les recettes en lignes
     X_count = vectorizer.fit_transform(
         df_recipes_ingredients["ingredients"].apply(lambda x: ", ".join(x))
     )
-    # Obtenir les noms des ingrédients
-    # ingredient_names = vectorizer.get_feature_names_out()
-    # Clusterisation avec KMeans des ingrédients (chaque ligne est un ingrédient)
-    kmeans = KMeans(nb_cluster, random_state=42)
-    clusters = kmeans.fit_predict(X_count)
+
+    # Étape 3 : Clusterisation
+    if clustering_type == "kmeans":
+        cluster_model = KMeans(n_clusters=nb_cluster, random_state=42)
+    elif clustering_type == "dbscan":
+        cluster_model = DBSCAN()
+    elif clustering_type == "agglomerative":
+        cluster_model = AgglomerativeClustering(n_clusters=nb_cluster)
+    else:
+        raise ValueError("Type de clusterisation non supporté.")
+    clusters = cluster_model.fit_predict(X_count.toarray())
 
     # Création d'un DataFrame pour stocker les résultats de clusterisation
     df_ingredients_clusters = pd.DataFrame(
@@ -182,10 +201,16 @@ def generate_kmeans_recipe(session, nb_cluster):
     )
 
     # Réduction de dimension avec PCA pour visualisation
-    pca = PCA(n_components=2)
-    X_pca = pca.fit_transform(X_count.toarray())
-    df_ingredients_clusters["pca_x"] = X_pca[:, 0]
-    df_ingredients_clusters["pca_y"] = X_pca[:, 1]
+    if reduction_type == "svd":
+        reducer = TruncatedSVD(n_components=n_components, random_state=42)
+    elif reduction_type == "pca":
+        reducer = PCA(n_components=n_components, random_state=42)
+    else:
+        raise ValueError("Type de réduction non supporté.")
+
+    X_reducer = reducer.fit_transform(X_count.toarray())
+    df_ingredients_clusters["pca_x"] = X_reducer[:, 0]
+    df_ingredients_clusters["pca_y"] = X_reducer[:, 1]
 
     return df_ingredients_clusters, nombre_total_recettes, nombre_total_ingredients
 
@@ -260,15 +285,130 @@ def generate_kmeans_ingredient(session, nb_cluster):
     for ingredients_list in df_recipes_ingredients["ingredients"]:
         for i in range(len(ingredients_list)):
             for j in range(i + 1, len(ingredients_list)):
-                co_occurrence_matrix.loc[ingredients_list[i], ingredients_list[j]] += 1
-                co_occurrence_matrix.loc[ingredients_list[j], ingredients_list[i]] += 1
+                co_occurrence_matrix.loc[ingredients_list[i],
+                                         ingredients_list[j]] += 1
+                co_occurrence_matrix.loc[ingredients_list[j],
+                                         ingredients_list[i]] += 1
 
     # Clustering avec KMeans basé sur la similarité cosinus
     similarity_matrix = cosine_similarity(co_occurrence_matrix)
-    kmeans = KMeans(n_clusters=nb_cluster, random_state=0).fit(similarity_matrix)
+    kmeans = KMeans(n_clusters=nb_cluster,
+                    random_state=0).fit(similarity_matrix)
 
     # Visualisation des clusters après réduction de dimension
     pca = PCA(n_components=2)
     reduced_data = pca.fit_transform(similarity_matrix)
 
     return reduced_data, all_ingredients, kmeans
+
+
+def generate_matrice_ingredient(session):
+    """
+    Renvoie une matrice de co-occurence des ingrédients dans les recettes.
+
+    réduction du dataset, on enlève :
+    - les recettes avec moins de 3 ingrédients,
+    - les recettes avec moins de 20 reviews,
+    - les ingrédients qui apparaissent dans moins de 5 recettes et les ingrédients / recettes associés.
+
+    Paramètres:
+    - session : SQLAlchemy session pour la base de données.
+
+    Retourne:
+    - pd.DataFrame : dataframe contenant la matrice de co occurence
+    """
+    results = (
+        session.query(
+            cook.Recipe.recipe_id,
+            # Agréger les noms d'ingrédients dans une liste
+            func.array_agg(cook.Ingredient.name).label(
+                "ingredients"),
+        )
+        .join(
+            cook.recipe_ingredient,
+            cook.Recipe.recipe_id == cook.recipe_ingredient.c.recipe_id,
+        )
+        .join(
+            cook.Ingredient,
+            cook.recipe_ingredient.c.ingredient_id == cook.Ingredient.ingredient_id,
+        )
+        .group_by(cook.Recipe.recipe_id)
+        .where(
+            (cook.Recipe.nb_rating > 15)
+            & (cook.Recipe.n_ingredients > 3)
+            & (cook.Ingredient.nb_recette > 5)
+        )
+        .all()
+    )
+
+    # Conversion des résultats en un DataFrame
+    df_recipes_ingredients = pd.DataFrame(
+        [
+            {"id_recipe": result.recipe_id,
+                "ingredients": result.ingredients}
+            for result in results
+        ]
+    )
+
+    # Extraction de tous les ingrédients uniques
+    all_ingredients = sorted(
+        set(
+            ingredient
+            for ingredients_list in df_recipes_ingredients["ingredients"]
+            for ingredient in ingredients_list
+        )
+    )
+
+    # Initialisation de la matrice de co-occurrence
+    co_occurrence_matrix = pd.DataFrame(
+        0, index=all_ingredients, columns=all_ingredients
+    )
+
+    # Remplissage de la matrice en comptant les co-occurrences
+    for ingredients_list in df_recipes_ingredients["ingredients"]:
+        for i in range(len(ingredients_list)):
+            for j in range(i + 1, len(ingredients_list)):
+                co_occurrence_matrix.loc[ingredients_list[i],
+                                         ingredients_list[j]] += 1
+                co_occurrence_matrix.loc[ingredients_list[j],
+                                         ingredients_list[i]] += 1
+    return co_occurrence_matrix, all_ingredients
+
+
+def suggestingredients(co_occurrence_matrix, ingredient, top_n=5):
+    """
+    Suggère des ingrédients qui vont bien avec l'ingrédient donné.
+
+    :param ingredient: Nom de l'ingrédient sélectionné.
+    :param top_n: Nombre de suggestions à retourner.
+    :return: Liste des meilleurs ingrédients suggérés.
+    """
+
+    # Récupère les occurrences associées à l'ingrédient
+    occurrences = co_occurrence_matrix.loc[ingredient]
+
+    # Trie les ingrédients par occurrence décroissante
+    suggested = occurrences.sort_values(ascending=False).head(top_n)
+
+    return [(index, value) for index, value in suggested[suggested > 0].items()]
+
+
+def get_ingredient_rating(session, ingredient_name):
+    """
+    Récupère la note moyenne (rating) d'un ingrédient en fonction de sum_rating et count_review.
+
+    :param session: La session SQLAlchemy active.
+    :param ingredient_id: L'identifiant de l'ingrédient.
+    :return: La note moyenne de l'ingrédient (float), ou None si les données ne sont pas disponibles.
+    """
+    result = (
+        session.query(
+            (cast(func.sum(cook.Ingredient.sum_rating), Float) /
+             cast(func.sum(cook.Ingredient.count_review), Float)).label("rating")
+        )
+        .filter(cook.Ingredient.ingredient_name == ingredient_name)
+        .first()
+    )
+
+    # Retourne la note moyenne si elle existe
+    return round(result.rating, 2) if result and result.rating is not None else None

@@ -25,7 +25,8 @@ def generate_layout():
     # Titre principal de l'application
     st.image("src/frontend/images/mangetamain.jpg")
 
-    menu = st.selectbox("", ["Généralité", "Clusterisation", "Page 3"])
+    menu = st.selectbox(
+        "", ["Généralité", "Clusterisation", "Ingrédients qui vont bien ensemble"])
 
     # Zone principale de contenu
     st.header(menu)
@@ -51,7 +52,7 @@ def generate_layout():
 
 
 ### Travaux sur les ingrédients ###
-def display_kmeans_recipe(df_recipes_ingredients):
+def display_cluster_recipe(df_recipes_ingredients):
     """
     Affiche les clusters d'ingrédients en fonction des recettes sous forme de graphique interactif.
 
@@ -68,6 +69,7 @@ def display_kmeans_recipe(df_recipes_ingredients):
         hover_data=["recette"],
         title="Cluster des ingrédients en fonction des recettes",
     )
+    fig.update_layout(height=650)
     st.plotly_chart(fig)
 
 
@@ -88,4 +90,46 @@ def display_kmeans_ingredient(df_recipes_ingredients):
         hover_data=["ingredient"],
         title="Cluster des ingrédients en fonction des recettes",
     )
+    st.plotly_chart(fig)
+
+
+def display_cloud_ingredient(co_occurrence_matrix, selected_ingredient):
+    # Exclure les zéros
+    co_occurrences = co_occurrence_matrix.loc[selected_ingredient]
+    co_occurrences = co_occurrences[co_occurrences > 0]
+
+    # Générer les coordonnées radiales
+    angles = np.linspace(0, 2 * np.pi, len(co_occurrences), endpoint=False)
+    radius = co_occurrences.values / co_occurrences.max() * 10  # Échelle du rayon
+    x = radius * np.cos(angles)
+    y = radius * np.sin(angles)
+
+    # Créer le DataFrame pour le graphique
+    plot_data = pd.DataFrame({
+        "ingredient": co_occurrences.index,
+        "x": x,
+        "y": y,
+        "weight": co_occurrences.values
+    })
+
+    # Ajouter le point central
+    plot_data = pd.concat([
+        pd.DataFrame({"ingredient": [selected_ingredient], "x": [
+                     0], "y": [0], "weight": [0]}),
+        plot_data
+    ])
+
+    # Visualisation avec Plotly
+    fig = px.scatter(
+        plot_data,
+        x="x",
+        y="y",
+        text="ingredient",
+        size="weight",
+        title=f"Nuage de points pour '{selected_ingredient}'",
+        labels={"x": "Position X", "y": "Position Y"},
+    )
+    fig.update_traces(textposition="top center")
+
+    # Affichage dans Streamlit
     st.plotly_chart(fig)

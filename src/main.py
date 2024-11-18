@@ -13,6 +13,7 @@ from sqlalchemy import create_engine
 import src.backend.backend as backend
 import src.frontend.frontend as frontend
 import plotly.express as px
+import random
 
 
 # Charger les variables d'environnement
@@ -174,19 +175,30 @@ if __name__ == "__main__":
     elif menu == "Clusterisation":
         with col1:
             nb_cluster = st.slider(
-                "Nombre de clusters", min_value=2, max_value=10, value=3, step=1
+                "Nombre de clusters", min_value=2, max_value=10, value=2, step=1
+            )
+            matrix_type = st.selectbox(
+                "Type de matrice à utiliser :",
+                options=["tfidf", "count"]
+            )
+            reduction_type = st.selectbox(
+                "Type de réduction de dimensionnalité :",
+                options=["pca", "svd"]
+            )
+            clustering_type = st.selectbox(
+                "Algorithme de clusterisation :",
+                options=["kmeans", "dbscan", "agglomerative"]
             )
             st.text("Filtres:")
             st.markdown(
                 """
-                    - les recettes avec moins de 3 ingrédientss
-                    - les recettes avec moins de 20 reviews
-                    - les ingrédients qui apparaissent dans moins de 5 recettes
-                    - et les ingrédients / recettes associés"""
+                    * les recettes avec plus de 3 ingrédientss
+                    * les recettes avec plus de 15 reviews
+                    * les ingrédients qui apparaissent dans moins de 5 recettes
+                    * et les ingrédients / recettes associés"""
             )
-            df, nombre_total_recettes, nombre_total_ingredients = (
-                backend.generate_kmeans_recipe(session, nb_cluster)
-            )
+            df, nombre_total_recettes, nombre_total_ingredients = backend.generate_cluster_recipe(
+                session, matrix_type, reduction_type, clustering_type, 2, nb_cluster)
             st.text("Nombre de recettes après filtres : " +
                     str(nombre_total_recettes))
             st.text(
@@ -194,30 +206,34 @@ if __name__ == "__main__":
                 str(nombre_total_ingredients)
             )
         with col2:
-            frontend.display_kmeans_recipe(df)
-        with col3:
-            nb_cluster2 = 5
-            reduced_data, all_ingredients, kmeans = backend.generate_kmeans_ingredient(
-                session, nb_cluster2
-            )
-            # Création d'un DataFrame pour Plotly
-            plot_data = pd.DataFrame(
-                reduced_data, columns=["PCA Dimension 1", "PCA Dimension 2"]
-            )
-            plot_data["ingredient"] = all_ingredients
-            plot_data["cluster"] = kmeans.labels_
+            frontend.display_cluster_recipe(df)
 
-            # Visualisation avec Plotly
-            fig = px.scatter(
-                plot_data,
-                x="PCA Dimension 1",
-                y="PCA Dimension 2",
-                color="cluster",
-                title="Clustering des ingrédients basés sur la co-occurrence",
-            )
+    elif menu == "Ingrédients qui vont bien ensemble":
+        with col1:
+            if 'co_occurrence_matrix' not in locals():
+                co_occurrence_matrix, all_ingredients = backend.generate_matrice_ingredient(
+                    session)
+            st.title("Suggestions d'Ingrédients")
+            st.write(
+                "Sélectionnez un ingrédient pour obtenir des suggestions qui vont bien avec.")
 
-            fig.update_traces(textposition="top center")
-            fig.update_layout(legend_title_text="Cluster")
-            fig.show()
-    elif menu == "Page 3":
-        st.subheader("page 3")
+            # Champ de recherche avec autocomplétion
+            selected_ingredient = st.selectbox(
+                "Recherchez un ingrédient :",
+                options=all_ingredients
+            )
+            if selected_ingredient:
+                suggestions = backend.suggestingredients(
+                    co_occurrence_matrix, selected_ingredient, top_n=5)
+                if suggestions:
+                    st.subheader(
+                        f"Ingrédients qui vont bien avec '{selected_ingredient}':")
+                    for ingredient, co_occurrence in suggestions:
+                        st.write(
+                            f"- {ingredient} : Note {backend.get_ingredient_rating(session, ingredient)} | {co_occurrence} occurrences")
+                else:
+                    st.write("Aucune suggestion disponible.")
+        with col2:
+            if selected_ingredient:
+                frontend.display_cloud_ingredient(
+                    co_occurrence_matrix, selected_ingredient)
