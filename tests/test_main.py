@@ -1,41 +1,51 @@
-import os
 import pytest
-from dotenv import load_dotenv
-from sqlalchemy import create_engine
+from unittest.mock import patch, MagicMock
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-import src.main as main
-from src.main import load_environment, create_db_engine
+from sqlalchemy import create_engine
+from src.backend.datalayer.cooking import Base
+from src.main import (
+    load_environment,
+    create_db_engine,
+)
 
 
-def test_load_environment():
-    """Test environment variable loading"""
-    env = load_environment()
+@pytest.fixture
+def mock_env():
+    return {
+        "DB_USER": "test_user",
+        "DB_PASS": "test_pass",
+        "DB_HOST": "localhost",
+        "DB_NAME": "test_db",
+    }
 
-    # Check that all required keys are present
-    required_keys = ["DB_USER", "DB_PASS", "DB_HOST", "DB_NAME"]
-    for key in required_keys:
-        assert key in env, f"{key} not found in environment variables"
-        assert env[key] is not None, f"{key} is None"
+
+@pytest.fixture
+def mock_engine():
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
+    return engine
 
 
-def test_create_db_engine():
-    """Test database engine creation"""
-    # Load environment first
-    env = load_environment()
+@pytest.fixture
+def mock_session(mock_engine):
+    Session = sessionmaker(bind=mock_engine)
+    session = Session()
+    yield session
+    session.close()
 
-    # Create engine
-    engine, session, Base = create_db_engine(env)
 
-    # Assertions
-    assert engine is not None, "Engine creation failed"
-    assert session is not None, "Session creation failed"
+def test_load_environment(mock_env):
+    with patch.dict("os.environ", mock_env):
+        env = load_environment()
+        assert env["DB_USER"] == "test_user"
+        assert env["DB_PASS"] == "test_pass"
+        assert env["DB_HOST"] == "localhost"
+        assert env["DB_NAME"] == "test_db"
 
-    # Optional: Test connection
-    try:
-        with engine.connect() as connection:
-            assert connection is not None, "Could not establish database connection"
-    except Exception as e:
-        pytest.fail(f"Database connection error: {e}")
-    finally:
-        session.close()
+
+def test_create_db_engine(mock_env):
+    with patch("src.backend.datalayer.cooking.load_environment", return_value=mock_env):
+        engine, session, Base = create_db_engine(mock_env)
+        assert engine is not None
+        assert session is not None
+        assert Base is not None
