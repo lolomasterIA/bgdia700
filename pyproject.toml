@@ -19,6 +19,7 @@ streamlit = "^1.39.0"
 plotly = "^5.24.1"
 argparse = "^1.4.0"
 pytest-mock = "^3.14.0"
+scikit-learn = "^1.5.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest-cov = "^5.0.0"
