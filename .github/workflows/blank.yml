@@ -76,7 +76,7 @@
       # Étape 8 : Exécuter les tests unitaires
       - name: Run unit tests with pytest
         run: |
-          poetry run pytest --cov=src --cov-report=xml
+          poetry run pytest --cov=src --cov-report=term-missing
         env:
           # Configuration pour s'assurer que la couverture est suffisante
           PYTEST_ADDOPTS: "--maxfail=1 --disable-warnings"
