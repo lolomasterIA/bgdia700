@@ -21,22 +21,43 @@ from dotenv import load_dotenv
 import os
 import pandas as pd
 
-# Charger les variables d'environnement
-load_dotenv()
 
-DB_USER = os.getenv("DB_USER")
-DB_PASS = os.getenv("DB_PASS")
-DB_HOST = os.getenv("DB_HOST")
-DB_NAME = os.getenv("DB_NAME")
+def load_environment():
+    """
+    Charge les variables d'environnement à partir d'un fichier .env.
 
-# Connexion à la base de données PostgreSQL
-DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:5432/{DB_NAME}"
-engine = create_engine(DATABASE_URL)
-Base = declarative_base()
+    Retourne:
+        dict: Un dictionnaire contenant les variables d'environnement pour la base de données.
+    """
+    load_dotenv()
+    return {
+        "DB_USER": os.getenv("DB_USER"),
+        "DB_PASS": os.getenv("DB_PASS"),
+        "DB_HOST": os.getenv("DB_HOST"),
+        "DB_NAME": os.getenv("DB_NAME"),
+    }
 
-# Configuration de la session SQLAlchemy
-Session = sessionmaker(bind=engine)
-session = Session()
+
+def create_db_engine(env):
+    """
+    Crée et retourne un moteur de base de données SQLAlchemy.
+
+    Paramètres:
+        env (dict): Un dictionnaire contenant les informations de connexion à la base de données.
+
+    Retourne:
+        sqlalchemy.engine.Engine: Un moteur de base de données SQLAlchemy.
+    """
+    DATABASE_URL = f"postgresql://{env['DB_USER']}:{env['DB_PASS']}@{env['DB_HOST']}:5432/{env['DB_NAME']}"
+    engine = create_engine(DATABASE_URL)
+    Base = declarative_base()
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    return engine, session, Base
+
+
+env = load_environment()
+engine, session, Base = create_db_engine(env)
 
 
 # Meta classe pour avoir des getters lisibles des objets
