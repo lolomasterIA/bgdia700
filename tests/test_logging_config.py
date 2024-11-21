@@ -9,7 +9,7 @@ from src.logging_config import setup_logging
 def mock_os():
     with patch("os.makedirs") as makedirs_mock, patch(
         "os.path.exists", return_value=False
-    ) as exists_mock:
+    ) as exists_mock, patch("builtins.open", new_callable=MagicMock):
         yield makedirs_mock, exists_mock
 
 

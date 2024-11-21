@@ -30,6 +30,12 @@ def setup_logging():
     if not os.path.exists("logs"):
         os.makedirs("logs")
 
+    logging.basicConfig(
+        filename=os.path.join("logs", "debug.log"),
+        level=logging.DEBUG,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
+
     # Create a logger
     logger = logging.getLogger("user_actions")
     logger.setLevel(logging.DEBUG)
