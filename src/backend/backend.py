@@ -169,8 +169,7 @@ def generate_cluster_recipe(session, matrix_type="tfidf", reduction_type="pca", 
     # Nombre total de recettes
     nombre_total_recettes = df_recipes_ingredients["id_recipe"].nunique()
     # Nombre total d'ingrédients (en considérant les ingrédients uniques dans toutes les recettes)
-    nombre_total_ingredients = df_recipes_ingredients["ingredients"].explode(
-    ).nunique()
+    nombre_total_ingredients = df_recipes_ingredients["ingredients"].explode().nunique()
 
     # Avec CountVectorizer et tfidf
     if matrix_type == "tfidf":
@@ -179,12 +178,13 @@ def generate_cluster_recipe(session, matrix_type="tfidf", reduction_type="pca", 
         vectorizer = CountVectorizer(tokenizer=lambda x: x.split(", "))
     else:
         raise ValueError("Type de matrice non supporté.")
+
     # Les recettes en lignes
     X_count = vectorizer.fit_transform(
         df_recipes_ingredients["ingredients"].apply(lambda x: ", ".join(x))
     )
 
-    # Étape 3 : Clusterisation
+    # Clusterisation
     if clustering_type == "kmeans":
         cluster_model = KMeans(n_clusters=nb_cluster, random_state=42)
     elif clustering_type == "dbscan":

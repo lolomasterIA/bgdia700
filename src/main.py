@@ -16,32 +16,47 @@ import plotly.express as px
 import random
 
 
-# Charger les variables d'environnement
-load_dotenv()
+def load_environment():
+    """
+    Charge les variables d'environnement à partir d'un fichier .env.
 
-# Connexion à la base de données PostgreSQL cooking
-DB_USER = os.getenv("DB_USER")
-DB_PASS = os.getenv("DB_PASS")
-DB_HOST = os.getenv("DB_HOST")
-DB_NAME = os.getenv("DB_NAME")
-DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:5432/{DB_NAME}"
-engine = create_engine(DATABASE_URL)
-Base = declarative_base()
-Session = sessionmaker(bind=engine)
-session = Session()
+    Retourne:
+        dict: Un dictionnaire contenant les variables d'environnement pour la base de données.
+    """
+    load_dotenv()
+    return {
+        "DB_USER": os.getenv("DB_USER"),
+        "DB_PASS": os.getenv("DB_PASS"),
+        "DB_HOST": os.getenv("DB_HOST"),
+        "DB_NAME": os.getenv("DB_NAME"),
+    }
 
-# Configurer le logger
-logger = setup_logging()
 
-# Exemple d'utilisation du logger
-# logger.debug("This is a debug message")
-# logger.error("This is an error message")
-# logger.critical("This is a critical message")
+def create_db_engine(env):
+    """
+    Crée et retourne un moteur de base de données SQLAlchemy.
 
-# Votre code principal ici
+    Paramètres:
+        env (dict): Un dictionnaire contenant les informations de connexion à la base de données.
+
+    Retourne:
+        sqlalchemy.engine.Engine: Un moteur de base de données SQLAlchemy.
+    """
+    DATABASE_URL = f"postgresql://{env['DB_USER']}:{env['DB_PASS']}@{env['DB_HOST']}:5432/{env['DB_NAME']}"
+    engine = create_engine(DATABASE_URL)
+    Base = declarative_base()
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    return engine, session, Base
+
+
 if __name__ == "__main__":
+    env = load_environment()
+    engine, session, Base = create_db_engine(env)
+
+    logger = setup_logging()
+
     logger.info("Application started")
-    # ... votre code ...
 
     menu, col1, col2, col3, col4, col5, col6 = frontend.generate_layout()
 
@@ -61,8 +76,7 @@ if __name__ == "__main__":
         top_ingredient_used = backend.top_ingredient_used(session, 10)
         df_top_ingredient_used = pd.DataFrame(top_ingredient_used)
         df_top_ingredient_used = df_top_ingredient_used.rename(
-            columns={"name": "Ingrédient",
-                     "recipe_count": "Nombre de recettes"}
+            columns={"name": "Ingrédient", "recipe_count": "Nombre de recettes"}
         )
 
         # Notes moyennes et nombre de reviews pour chaque ingrédient
@@ -94,28 +108,24 @@ if __name__ == "__main__":
         with col1:
             # Affichage du top 10 des ingrédients les plus utilisés
             styled_top_10 = (
-                df_top_ingredient_used.style.highlight_max(
-                    axis=0, color="lightgreen")
+                df_top_ingredient_used.style.highlight_max(axis=0, color="lightgreen")
                 .highlight_min(axis=0, color="lightcoral")
                 .format({"Nombre": "{:.1f}%"})
             )
             st.subheader(
-                "Top 10 des ingrédients (total : " +
-                str(total_ingredient) + ")"
+                "Top 10 des ingrédients (total : " + str(total_ingredient) + ")"
             )
             st.dataframe(styled_top_10, use_container_width=True)
 
         with col2:
             # Création d'un graphique en barres pour visualiser le nombre de recettes en fonction du nombre d'ingrédients
             st.subheader(
-                "Nb recettes (total : " + str(total_recettes) +
-                ") / nb ingrédients"
+                "Nb recettes (total : " + str(total_recettes) + ") / nb ingrédients"
             )
             fig = px.bar(
                 x=nombre_ingredients,
                 y=nombre_recettes,
-                labels={"x": "Nombre d'ingrédients",
-                        "y": "Nombre de recettes"},
+                labels={"x": "Nombre d'ingrédients", "y": "Nombre de recettes"},
                 title="Nombre de recettes en fonction du nombre d'ingrédients",
             )
             fig.update_xaxes(dtick=2)
@@ -197,13 +207,12 @@ if __name__ == "__main__":
                     * les ingrédients qui apparaissent dans moins de 5 recettes
                     * et les ingrédients / recettes associés"""
             )
+
             df, nombre_total_recettes, nombre_total_ingredients = backend.generate_cluster_recipe(
                 session, matrix_type, reduction_type, clustering_type, 2, nb_cluster)
-            st.text("Nombre de recettes après filtres : " +
-                    str(nombre_total_recettes))
+
             st.text(
-                "Nombre d'ingrédients après filtres : " +
-                str(nombre_total_ingredients)
+                "Nombre d'ingrédients après filtres : " + str(nombre_total_ingredients)
             )
         with col2:
             frontend.display_cluster_recipe(df)
