@@ -26,7 +26,7 @@ def generate_layout():
     st.image("src/frontend/images/mangetamain.jpg")
 
     menu = st.selectbox(
-        "", ["Généralité", "Clusterisation", "Ingrédients qui vont bien ensemble"])
+        "", ["Généralité", "Clusterisation", "Ingrédients qui vont bien ensemble", ""])
 
     # Zone principale de contenu
     st.header(menu)
@@ -94,6 +94,13 @@ def display_kmeans_ingredient(df_recipes_ingredients):
 
 
 def display_cloud_ingredient(co_occurrence_matrix, selected_ingredient):
+    """
+    Tentative d'afficher un ingredient avec la distance des autres ingrédients.
+
+    Paramètres:
+    - co_occurrence_matrix: np.array des co occurrences des ingrédients
+    - selected_ingredient: l'ingredient à comparer
+    """
     # Exclure les zéros
     co_occurrences = co_occurrence_matrix.loc[selected_ingredient]
     co_occurrences = co_occurrences[co_occurrences > 0]

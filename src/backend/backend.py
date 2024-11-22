@@ -116,6 +116,7 @@ def generate_cluster_recipe(session, matrix_type="tfidf", reduction_type="pca", 
     """
     Effectue une clusterisation des ingrédients en fonction de leur utilisation dans les recettes.
     réduction du dataset, on enlève :
+
     - les recettes avec moins de 3 ingrédients,
     - les recettes avec moins de 15 reviews,
     - les ingrédients qui apparaissent dans moins de 5 recettes et les ingrédients / recettes associés.
@@ -135,6 +136,7 @@ def generate_cluster_recipe(session, matrix_type="tfidf", reduction_type="pca", 
     - le nombre de recette
     - le nombre d'ingrédient
     """
+
     results = (
         session.query(
             cook.Recipe.name,
@@ -169,7 +171,8 @@ def generate_cluster_recipe(session, matrix_type="tfidf", reduction_type="pca", 
     # Nombre total de recettes
     nombre_total_recettes = df_recipes_ingredients["id_recipe"].nunique()
     # Nombre total d'ingrédients (en considérant les ingrédients uniques dans toutes les recettes)
-    nombre_total_ingredients = df_recipes_ingredients["ingredients"].explode().nunique()
+    nombre_total_ingredients = df_recipes_ingredients["ingredients"].explode(
+    ).nunique()
 
     # Avec CountVectorizer et tfidf
     if matrix_type == "tfidf":
@@ -412,3 +415,13 @@ def get_ingredient_rating(session, ingredient_name):
 
     # Retourne la note moyenne si elle existe
     return round(result.rating, 2) if result and result.rating is not None else None
+
+
+# on dit que les ingrédients sont naturellement bons
+# on dit que s'ils sont mauvais c'est qu'ils sont mal préparer, que la recette est compliqué
+# On va voir s'il y a une corrélation
+# recipe.minutes
+# recipe.n_steps
+# recipe.n_ingredients
+# len(recipe.steps)
+# len(description)

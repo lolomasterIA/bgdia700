@@ -76,7 +76,8 @@ if __name__ == "__main__":
         top_ingredient_used = backend.top_ingredient_used(session, 10)
         df_top_ingredient_used = pd.DataFrame(top_ingredient_used)
         df_top_ingredient_used = df_top_ingredient_used.rename(
-            columns={"name": "Ingrédient", "recipe_count": "Nombre de recettes"}
+            columns={"name": "Ingrédient",
+                     "recipe_count": "Nombre de recettes"}
         )
 
         # Notes moyennes et nombre de reviews pour chaque ingrédient
@@ -108,24 +109,28 @@ if __name__ == "__main__":
         with col1:
             # Affichage du top 10 des ingrédients les plus utilisés
             styled_top_10 = (
-                df_top_ingredient_used.style.highlight_max(axis=0, color="lightgreen")
+                df_top_ingredient_used.style.highlight_max(
+                    axis=0, color="lightgreen")
                 .highlight_min(axis=0, color="lightcoral")
                 .format({"Nombre": "{:.1f}%"})
             )
             st.subheader(
-                "Top 10 des ingrédients (total : " + str(total_ingredient) + ")"
+                "Top 10 des ingrédients (total : " +
+                str(total_ingredient) + ")"
             )
             st.dataframe(styled_top_10, use_container_width=True)
 
         with col2:
             # Création d'un graphique en barres pour visualiser le nombre de recettes en fonction du nombre d'ingrédients
             st.subheader(
-                "Nb recettes (total : " + str(total_recettes) + ") / nb ingrédients"
+                "Nb recettes (total : " + str(total_recettes) +
+                ") / nb ingrédients"
             )
             fig = px.bar(
                 x=nombre_ingredients,
                 y=nombre_recettes,
-                labels={"x": "Nombre d'ingrédients", "y": "Nombre de recettes"},
+                labels={"x": "Nombre d'ingrédients",
+                        "y": "Nombre de recettes"},
                 title="Nombre de recettes en fonction du nombre d'ingrédients",
             )
             fig.update_xaxes(dtick=2)
@@ -212,7 +217,8 @@ if __name__ == "__main__":
                 session, matrix_type, reduction_type, clustering_type, 2, nb_cluster)
 
             st.text(
-                "Nombre d'ingrédients après filtres : " + str(nombre_total_ingredients)
+                "Nombre d'ingrédients après filtres : " +
+                str(nombre_total_ingredients)
             )
         with col2:
             frontend.display_cluster_recipe(df)
@@ -226,7 +232,7 @@ if __name__ == "__main__":
             st.write(
                 "Sélectionnez un ingrédient pour obtenir des suggestions qui vont bien avec.")
 
-            # Champ de recherche avec autocomplétion
+            # Liste des ingrédients
             selected_ingredient = st.selectbox(
                 "Recherchez un ingrédient :",
                 options=all_ingredients
@@ -244,5 +250,4 @@ if __name__ == "__main__":
                     st.write("Aucune suggestion disponible.")
         with col2:
             if selected_ingredient:
-                frontend.display_cloud_ingredient(
-                    co_occurrence_matrix, selected_ingredient)
+                # frontend.display_cloud_ingredient(co_occurrence_matrix, selected_ingredient)

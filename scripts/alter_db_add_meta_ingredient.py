@@ -39,6 +39,10 @@ nlp = spacy.load("en_core_web_sm")
 
 # Fonction de lemmatisation stricte
 def lemmatize_name(name):
+    """
+    lemmatize le mot 'name'
+    Return : le lem
+    """
     doc = nlp(name.lower())  # Convertir en minuscules
     # Lemmatiser les tokens
     lemmatized = " ".join(token.lemma_ for token in doc if not token.is_stop)
