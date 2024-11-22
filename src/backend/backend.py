@@ -165,7 +165,7 @@ def generate_kmeans_recipe(session, nb_cluster):
     nombre_total_ingredients = df_recipes_ingredients["ingredients"].explode().nunique()
 
     # Avec CountVectorizer car tfidf dimunue les mots les plus fréquents
-    vectorizer = CountVectorizer(tokenizer=lambda x: x.split(", "))
+    vectorizer = CountVectorizer(tokenizer=lambda x: x.split(", "), token_pattern=None)
     # Les recettes en lignes
     X_count = vectorizer.fit_transform(
         df_recipes_ingredients["ingredients"].apply(lambda x: ", ".join(x))
