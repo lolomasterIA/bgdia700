@@ -26,7 +26,8 @@ def generate_layout():
     st.image("src/frontend/images/mangetamain.jpg")
 
     menu = st.selectbox(
-        "", ["Généralité", "Clusterisation", "Ingrédients qui vont bien ensemble"])
+        "", ["Généralité", "Clusterisation", "Ingrédients qui vont bien ensemble"]
+    )
 
     # Zone principale de contenu
     st.header(menu)
@@ -94,6 +95,17 @@ def display_kmeans_ingredient(df_recipes_ingredients):
 
 
 def display_cloud_ingredient(co_occurrence_matrix, selected_ingredient):
+    """
+    Affiche un nuage de points des ingrédients en utilisant les données fournies.
+
+    Args:
+        co_occurrence_matrix (DataFrame): La matrice de co-occurrence des ingrédients.
+        selected_ingredient (str): L'ingrédient sélectionné pour afficher les co-occurrences.
+
+    Returns
+    -------
+    None
+    """
     # Exclure les zéros
     co_occurrences = co_occurrence_matrix.loc[selected_ingredient]
     co_occurrences = co_occurrences[co_occurrences > 0]
@@ -105,19 +117,24 @@ def display_cloud_ingredient(co_occurrence_matrix, selected_ingredient):
     y = radius * np.sin(angles)
 
     # Créer le DataFrame pour le graphique
-    plot_data = pd.DataFrame({
-        "ingredient": co_occurrences.index,
-        "x": x,
-        "y": y,
-        "weight": co_occurrences.values
-    })
+    plot_data = pd.DataFrame(
+        {
+            "ingredient": co_occurrences.index,
+            "x": x,
+            "y": y,
+            "weight": co_occurrences.values,
+        }
+    )
 
     # Ajouter le point central
-    plot_data = pd.concat([
-        pd.DataFrame({"ingredient": [selected_ingredient], "x": [
-                     0], "y": [0], "weight": [0]}),
-        plot_data
-    ])
+    plot_data = pd.concat(
+        [
+            pd.DataFrame(
+                {"ingredient": [selected_ingredient], "x": [0], "y": [0], "weight": [0]}
+            ),
+            plot_data,
+        ]
+    )
 
     # Visualisation avec Plotly
     fig = px.scatter(

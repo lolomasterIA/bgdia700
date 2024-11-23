@@ -21,6 +21,7 @@ argparse = "^1.4.0"
 pytest-mock = "^3.14.0"
 scikit-learn = "^1.5.2"
 matplotlib = "^3.9.2"
+spacy = "^3.8.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest-cov = "^5.0.0"

@@ -24,13 +24,7 @@ Base = declarative_base()
 Session = sessionmaker(bind=engine)
 session = Session()
 
-results = (
-    session.query(
-        cook.Ingredient.name,
-        cook.Ingredient.ingredient_id
-    )
-    .all()
-)
+results = session.query(cook.Ingredient.name, cook.Ingredient.ingredient_id).all()
 
 
 # Charger un modèle NLP anglais
@@ -39,6 +33,17 @@ nlp = spacy.load("en_core_web_sm")
 
 # Fonction de lemmatisation stricte
 def lemmatize_name(name):
+    """
+    Lemmatiser le nom donné en le convertissant en minuscules et en supprimant les mots vides.
+
+    Args:
+        name (str): Le nom à lemmatiser.
+
+    Returns
+    -------
+    str
+        La version lemmatisée du nom.
+    """
     doc = nlp(name.lower())  # Convertir en minuscules
     # Lemmatiser les tokens
     lemmatized = " ".join(token.lemma_ for token in doc if not token.is_stop)
