@@ -3343,7 +3343,6 @@ scikit-learn = ["scikit-learn"]
 lock-version = "2.0"
 python-versions = "^3.11"
 content-hash = "bfe718f4f73f665c490047c0de4e405099cb5c0a017cabbd4e15c7144c512ae2"
-=======
 name = "weasel"
 version = "0.4.1"
 description = "Weasel: A small and easy workflow system"
