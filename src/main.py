@@ -228,20 +228,17 @@ if __name__ == "__main__":
             if 'co_occurrence_matrix' not in locals():
                 co_occurrence_matrix, all_ingredients = backend.generate_matrice_ingredient(
                     session)
-            st.title("Suggestions d'Ingrédients")
-            st.write(
-                "Sélectionnez un ingrédient pour obtenir des suggestions qui vont bien avec.")
-
+            st.subheader("Suggestions d'Ingrédients")
             # Liste des ingrédients
             selected_ingredient = st.selectbox(
-                "Recherchez un ingrédient :",
-                options=all_ingredients
+                "Sélectionnez un ingrédient pour obtenir des suggestions :",
+                options=all_ingredients, placeholder="cheese"
             )
             if selected_ingredient:
                 suggestions = backend.suggestingredients(
                     co_occurrence_matrix, selected_ingredient, top_n=5)
                 if suggestions:
-                    st.subheader(
+                    st.write(
                         f"Ingrédients qui vont bien avec '{selected_ingredient}':")
                     for ingredient, co_occurrence in suggestions:
                         st.write(
@@ -250,4 +247,40 @@ if __name__ == "__main__":
                     st.write("Aucune suggestion disponible.")
         with col2:
             if selected_ingredient:
-                # frontend.display_cloud_ingredient(co_occurrence_matrix, selected_ingredient)
+                frontend.display_cloud_ingredient(
+                    co_occurrence_matrix, selected_ingredient)
+    elif menu == "Corrélation minutes":
+        with col1:
+            selected_model = st.selectbox(
+                "Sélectionnez un modèle de prédiction :",
+                options=["rl", "xgb", "rf"], placeholder="rl"
+            )
+            selected_method = st.selectbox(
+                "Sélectionnez une méthode de nettoyage minutes",
+                options=["DeleteQ1Q3", "Capping", "Log", "Isolation Forest", "DBScan", "Local Outlier Factor"], placeholder="deleteQ1Q3"
+            )
+
+            mse, r2, coefficients, df_results = backend.generate_regression_minutes(
+                session, selected_model, selected_method)
+            st.write(selected_method)
+            st.write("mse = " + str(mse) + " / r2 = " + str(r2))
+            st.write("nombre de recettes : " + str(len(df_results)))
+            if coefficients is not None:
+                st.write(coefficients)
+        with col2:
+            frontend.display_minutes_byfeature(df_results)
+
+    elif menu == "Corrélation rating ingrédient":
+        with col1:
+            selected_model = st.selectbox(
+                "Sélectionnez un modèle de prédiction :",
+                options=["rl", "xgb", "rf"], placeholder="rl"
+            )
+
+            mse, r2, coefficients, df_results = backend.generate_regression_ingredient(
+                session, selected_model)
+            st.write("mse = " + str(mse) + " / r2 = " + str(r2))
+            if coefficients is not None:
+                st.write(coefficients)
+        with col2:
+            frontend.display_rating_ingredientbyfeature(df_results)

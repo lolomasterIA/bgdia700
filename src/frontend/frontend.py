@@ -7,6 +7,9 @@ import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
 import plotly.express as px
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 
 def generate_layout():
@@ -26,14 +29,14 @@ def generate_layout():
     st.image("src/frontend/images/mangetamain.jpg")
 
     menu = st.selectbox(
-        "", ["Généralité", "Clusterisation", "Ingrédients qui vont bien ensemble", ""])
+        "", ["Généralité", "Clusterisation", "Ingrédients qui vont bien ensemble", "Corrélation rating ingrédient", "Corrélation minutes"])
 
     # Zone principale de contenu
     st.header(menu)
 
     # Utilisation des colonnes pour diviser la zone centrale en plusieurs sections
     with st.container():
-        if menu == "Clusterisation":
+        if menu == "Clusterisation" or menu == "Ingrédients qui vont bien ensemble" or menu == "Corrélation rating ingrédient" or menu == "Corrélation minutes":
             col1, col2 = st.columns([1, 2])
         else:
             col1, col2 = st.columns(2)
@@ -101,42 +104,89 @@ def display_cloud_ingredient(co_occurrence_matrix, selected_ingredient):
     - co_occurrence_matrix: np.array des co occurrences des ingrédients
     - selected_ingredient: l'ingredient à comparer
     """
-    # Exclure les zéros
+    # Extraire les co-occurrences de l'ingrédient sélectionné
     co_occurrences = co_occurrence_matrix.loc[selected_ingredient]
-    co_occurrences = co_occurrences[co_occurrences > 0]
 
-    # Générer les coordonnées radiales
-    angles = np.linspace(0, 2 * np.pi, len(co_occurrences), endpoint=False)
-    radius = co_occurrences.values / co_occurrences.max() * 10  # Échelle du rayon
-    x = radius * np.cos(angles)
-    y = radius * np.sin(angles)
+    # Exclure les zéros
+    # Transformer les co-occurrences en un dictionnaire pour le nuage de mots
+    word_frequencies = co_occurrences[co_occurrences > 0].to_dict()
 
-    # Créer le DataFrame pour le graphique
-    plot_data = pd.DataFrame({
-        "ingredient": co_occurrences.index,
-        "x": x,
-        "y": y,
-        "weight": co_occurrences.values
-    })
+    # Générer le nuage de mots
+    wordcloud = WordCloud(
+        width=800,
+        height=400,
+        background_color="white",
+        colormap="viridis",
+        max_words=200
+    ).generate_from_frequencies(word_frequencies)
 
-    # Ajouter le point central
-    plot_data = pd.concat([
-        pd.DataFrame({"ingredient": [selected_ingredient], "x": [
-                     0], "y": [0], "weight": [0]}),
-        plot_data
-    ])
+    # Afficher le nuage de mots dans Streamlit
+    st.subheader(f"Nuage de mots pour '{selected_ingredient}'")
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.imshow(wordcloud, interpolation="bilinear")
+    ax.axis("off")
+    st.pyplot(fig)
 
-    # Visualisation avec Plotly
-    fig = px.scatter(
-        plot_data,
-        x="x",
-        y="y",
-        text="ingredient",
-        size="weight",
-        title=f"Nuage de points pour '{selected_ingredient}'",
-        labels={"x": "Position X", "y": "Position Y"},
+
+def display_rating_ingredientbyfeature(df_results):
+    """
+    Affiche un scatter plot 3D interactif avec Streamlit.
+
+    Arguments :
+    - df_results : DataFrame contenant les colonnes 'minutes', 'n_steps', 'n_ingredients', et 'rating'.
+    """
+
+    # Création de la figure
+    fig = plt.figure(figsize=(12, 8))
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Scatter plot
+    scatter = ax.scatter(
+        df_results['minutes'], df_results['n_steps'], df_results['n_ingredients'],
+        c=df_results['rating'], cmap='coolwarm', s=50, alpha=0.7
     )
-    fig.update_traces(textposition="top center")
 
-    # Affichage dans Streamlit
-    st.plotly_chart(fig)
+    # Labels
+    ax.set_xlabel('Minutes')
+    ax.set_ylabel('N Steps')
+    ax.set_zlabel('N Ingredients')
+    ax.set_title('Relation entre Minutes, N Steps, N Ingredients et Rating')
+
+    # Ajouter une barre de couleur
+    cbar = fig.colorbar(scatter, ax=ax, shrink=0.5)
+    cbar.set_label('Rating')
+
+    # Afficher la figure avec Streamlit
+    st.pyplot(fig)
+
+
+def display_minutes_byfeature(df_results):
+    """
+    Affiche un scatter plot 3D interactif avec Streamlit.
+
+    Arguments :
+    - df_results : DataFrame contenant les colonnes 'minutes', 'n_steps', 'n_ingredients', et 'len_steps'.
+    """
+
+    # Création de la figure
+    fig = plt.figure(figsize=(12, 8))
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Scatter plot
+    scatter = ax.scatter(
+        df_results['n_steps'], df_results['n_ingredients'], df_results['len_steps'],
+        c=df_results['minutes'], cmap='coolwarm', s=50, alpha=0.7
+    )
+
+    # Labels
+    ax.set_xlabel('N Steps')
+    ax.set_ylabel('N Ingredients')
+    ax.set_zlabel('Len Steps')
+    ax.set_title('3D Scatter Plot avec Minutes comme Intensité')
+
+    # Ajouter une barre de couleur
+    cbar = fig.colorbar(scatter, ax=ax, shrink=0.5)
+    cbar.set_label('Minutes')
+
+    # Afficher la figure avec Streamlit
+    st.pyplot(fig)
