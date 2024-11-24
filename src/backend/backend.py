@@ -52,7 +52,8 @@ def top_ingredient_used(session, n):
     results = (
         session.query(
             cook.Ingredient.name,
-            func.count(cook.recipe_ingredient.c.recipe_id).label("recipe_count"),
+            func.count(cook.recipe_ingredient.c.recipe_id).label(
+                "recipe_count"),
         )
         .join(
             cook.recipe_ingredient,
@@ -63,7 +64,8 @@ def top_ingredient_used(session, n):
     )
 
     # Trier les résultats par nombre de recettes en ordre décroissant
-    nbingredientsrecettes_trie = sorted(results, key=lambda x: x[1], reverse=True)
+    nbingredientsrecettes_trie = sorted(
+        results, key=lambda x: x[1], reverse=True)
 
     # Récupérer les n premiers ingrédients
     return nbingredientsrecettes_trie[:n]
@@ -300,12 +302,15 @@ def generate_kmeans_ingredient(session, nb_cluster):
     for ingredients_list in df_recipes_ingredients["ingredients"]:
         for i in range(len(ingredients_list)):
             for j in range(i + 1, len(ingredients_list)):
-                co_occurrence_matrix.loc[ingredients_list[i], ingredients_list[j]] += 1
-                co_occurrence_matrix.loc[ingredients_list[j], ingredients_list[i]] += 1
+                co_occurrence_matrix.loc[ingredients_list[i],
+                                         ingredients_list[j]] += 1
+                co_occurrence_matrix.loc[ingredients_list[j],
+                                         ingredients_list[i]] += 1
 
     # Clustering avec KMeans basé sur la similarité cosinus
     similarity_matrix = cosine_similarity(co_occurrence_matrix)
-    kmeans = KMeans(n_clusters=nb_cluster, random_state=0).fit(similarity_matrix)
+    kmeans = KMeans(n_clusters=nb_cluster,
+                    random_state=0).fit(similarity_matrix)
 
     # Visualisation des clusters après réduction de dimension
     pca = PCA(n_components=2)
@@ -378,8 +383,10 @@ def generate_matrice_ingredient(session):
     for ingredients_list in df_recipes_ingredients["ingredients"]:
         for i in range(len(ingredients_list)):
             for j in range(i + 1, len(ingredients_list)):
-                co_occurrence_matrix.loc[ingredients_list[i], ingredients_list[j]] += 1
-                co_occurrence_matrix.loc[ingredients_list[j], ingredients_list[i]] += 1
+                co_occurrence_matrix.loc[ingredients_list[i],
+                                         ingredients_list[j]] += 1
+                co_occurrence_matrix.loc[ingredients_list[j],
+                                         ingredients_list[i]] += 1
     return co_occurrence_matrix, all_ingredients
 
 
@@ -661,15 +668,15 @@ def delete_outliers(df, key="minutes", method="deletQ1Q3"):
         iso = IsolationForest(contamination=0.01, random_state=42)
         outliers = iso.fit_predict(df[["minutes", "n_steps", "n_ingredients"]])
         df["is_outlier"] = (outliers == -1)
-        df = df[df["is_outlier"] == False].drop(columns=["is_outlier"])
+        df = df[df["is_outlier"] is False].drop(columns=["is_outlier"])
     elif method == "DBScan":
         db = DBSCAN(eps=3, min_samples=5)
         labels = db.fit_predict(df[["minutes", "n_steps"]])
         df["is_outlier"] = (labels == -1)
-        df = df[df["is_outlier"] == False].drop(columns=["is_outlier"])
+        df = df[df["is_outlier"] is False].drop(columns=["is_outlier"])
     elif method == "Local Outlier Factor":
         lof = LocalOutlierFactor(n_neighbors=20, contamination=0.01)
         outliers = lof.fit_predict(df[["minutes", "n_steps"]])
         df["is_outlier"] = (outliers == -1)
-        df = df[df["is_outlier"] == False].drop(columns=["is_outlier"])
+        df = df[df["is_outlier"] is False].drop(columns=["is_outlier"])
     return df
