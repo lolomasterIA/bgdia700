@@ -193,16 +193,14 @@ if __name__ == "__main__":
                 "Nombre de clusters", min_value=2, max_value=10, value=2, step=1
             )
             matrix_type = st.selectbox(
-                "Type de matrice à utiliser :",
-                options=["tfidf", "count"]
+                "Type de matrice à utiliser :", options=["tfidf", "count"]
             )
             reduction_type = st.selectbox(
-                "Type de réduction de dimensionnalité :",
-                options=["pca", "svd"]
+                "Type de réduction de dimensionnalité :", options=["pca", "svd"]
             )
             clustering_type = st.selectbox(
                 "Algorithme de clusterisation :",
-                options=["kmeans", "dbscan", "agglomerative"]
+                options=["kmeans", "dbscan", "agglomerative"],
             )
             st.text("Filtres:")
             st.markdown(
@@ -213,8 +211,11 @@ if __name__ == "__main__":
                     * et les ingrédients / recettes associés"""
             )
 
-            df, nombre_total_recettes, nombre_total_ingredients = backend.generate_cluster_recipe(
-                session, matrix_type, reduction_type, clustering_type, 2, nb_cluster)
+            df, nombre_total_recettes, nombre_total_ingredients = (
+                backend.generate_cluster_recipe(
+                    session, matrix_type, reduction_type, clustering_type, 2, nb_cluster
+                )
+            )
 
             st.text(
                 "Nombre d'ingrédients après filtres : " +
@@ -236,13 +237,15 @@ if __name__ == "__main__":
             )
             if selected_ingredient:
                 suggestions = backend.suggestingredients(
-                    co_occurrence_matrix, selected_ingredient, top_n=5)
+                    co_occurrence_matrix, selected_ingredient, top_n=5
+                )
                 if suggestions:
                     st.write(
                         f"Ingrédients qui vont bien avec '{selected_ingredient}':")
                     for ingredient, co_occurrence in suggestions:
                         st.write(
-                            f"- {ingredient} : Note {backend.get_ingredient_rating(session, ingredient)} | {co_occurrence} occurrences")
+                            f"- {ingredient} : Note {backend.get_ingredient_rating(session, ingredient)} | {co_occurrence} occurrences"
+                        )
                 else:
                     st.write("Aucune suggestion disponible.")
         with col2:

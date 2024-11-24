@@ -63,13 +63,6 @@ def test_generate_layout_clusterisation():
         assert col6 is None
 
 
-def test_display_kmeans_recipe(df_recipes_ingredients):
-    # Mock la fonction Streamlit plotly_chart
-    with patch("streamlit.plotly_chart") as plotly_chart:
-        frontend.display_kmeans_recipe(df_recipes_ingredients)
-        assert plotly_chart.called
-
-
 def test_display_kmeans_ingredient(df_recipes_ingredients):
     # Mock la fonction Streamlit plotly_chart
     with patch("streamlit.plotly_chart") as plotly_chart:

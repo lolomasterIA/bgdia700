@@ -30,6 +30,7 @@ def generate_layout():
 
     menu = st.selectbox(
         "", ["Généralité", "Clusterisation", "Ingrédients qui vont bien ensemble", "Corrélation rating ingrédient", "Corrélation minutes"])
+    )
 
     # Zone principale de contenu
     st.header(menu)

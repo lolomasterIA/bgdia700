@@ -179,15 +179,13 @@ reviewer_recipe_review = Table(
     Column("reviewer_id", Integer, ForeignKey("reviewer.reviewer_id")),
     Column("recipe_id", Integer, ForeignKey("recipe.recipe_id")),
     Column("review_id", Integer, ForeignKey("review.review_id")),
-    PrimaryKeyConstraint("reviewer_id", "recipe_id",
-                         "review_id"),  # Clé composite
+    PrimaryKeyConstraint("reviewer_id", "recipe_id", "review_id"),  # Clé composite
 )
 
 contributor_recipe = Table(
     "contributor_recipe",
     Base.metadata,
-    Column("contributor_id", Integer, ForeignKey(
-        "contributor.contributor_id")),
+    Column("contributor_id", Integer, ForeignKey("contributor.contributor_id")),
     Column("recipe_id", Integer, ForeignKey("recipe.recipe_id")),
     PrimaryKeyConstraint("contributor_id", "recipe_id"),
 )

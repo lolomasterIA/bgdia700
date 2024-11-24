@@ -27,9 +27,12 @@ query = (
     session.query(
         cook.recipe_ingredient.c.ingredient_id,
         func.sum(cook.Review.rating).label("sum_rating"),
-        func.count(cook.Review.review_id).label("count_review")
+        func.count(cook.Review.review_id).label("count_review"),
     )
-    .join(cook.reviewer_recipe_review, cook.recipe_ingredient.c.recipe_id == cook.reviewer_recipe_review.c.recipe_id)
+    .join(
+        cook.reviewer_recipe_review,
+        cook.recipe_ingredient.c.recipe_id == cook.reviewer_recipe_review.c.recipe_id,
+    )
     .join(cook.Review, cook.reviewer_recipe_review.c.review_id == cook.Review.review_id)
     .group_by(cook.recipe_ingredient.c.ingredient_id)
 )

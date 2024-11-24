@@ -74,21 +74,6 @@ def test_top_ingredient_rating(session, mock_data):
     assert review_count["Ingredient 2"] == 20
 
 
-def test_generate_kmeans_recipe(session, mock_data):
-    # Définir un namedtuple pour simuler les résultats de la requête SQLAlchemy
-    RecipeIngredients = namedtuple("RecipeIngredients", ["name", "ingredients"])
-
-    # Mock la requête SQLAlchemy
-    session.query().join().join().group_by().where().all.return_value = [
-        RecipeIngredients("Recipe 1", ["Ingredient 1", "Ingredient 2"]),
-        RecipeIngredients("Recipe 2", ["Ingredient 2", "Ingredient 3"]),
-    ]
-    df, num_recipes, num_ingredients = backend.generate_kmeans_recipe(session, 2)
-    assert isinstance(df, pd.DataFrame)
-    assert num_recipes == 2
-    assert num_ingredients == 3
-
-
 def test_generate_kmeans_ingredient(session, mock_data):
     # Définir un namedtuple pour simuler les résultats de la requête SQLAlchemy
     RecipeIngredients = namedtuple("RecipeIngredients", ["recipe_id", "ingredients"])
