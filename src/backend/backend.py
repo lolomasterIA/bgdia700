@@ -128,6 +128,7 @@ def generate_cluster_recipe(
 ):
     """
     Effectue une clusterisation des ingrédients en fonction de leur utilisation dans les recettes.
+
     Réduction du dataset, on enlève :
     - les recettes avec moins de 3 ingrédients,
     - les recettes avec moins de 15 reviews,
