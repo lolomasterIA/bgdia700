@@ -35,6 +35,7 @@ nlp = spacy.load("en_core_web_sm")
 def lemmatize_name(name):
     """
     Lemmatize le mot 'name'.
+
     Lemmatiser le nom donné en le convertissant en minuscules et en supprimant les mots vides.
 
     Args:
