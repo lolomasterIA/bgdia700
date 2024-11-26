@@ -641,11 +641,16 @@ def generate_regression_minutes(session, model="rl", selected_method="DeleteQ1Q3
 
 def delete_outliers(df, key="minutes", method="deletQ1Q3"):
     """
+    Supprime différente entrée de la clé en fonction de la méthode.
+
     Paramètres:
     - df : jeux de données
     - key : paramètre surlequel faire la réduction
     - method : ="DeleteQ1Q3", "Capping", "Log", "Isolation Forest", "DBScan", "Local Outlier Factor"
+
+    Retourne : le dataset réduit.
     """
+
     if method == "DeleteQ1Q3":
         Q1 = df[key].quantile(0.25)
         Q3 = df[key].quantile(0.75)
