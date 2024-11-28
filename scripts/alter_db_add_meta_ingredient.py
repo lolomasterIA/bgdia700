@@ -24,8 +24,7 @@ Base = declarative_base()
 Session = sessionmaker(bind=engine)
 session = Session()
 
-results = session.query(cook.Ingredient.name,
-                        cook.Ingredient.ingredient_id).all()
+results = session.query(cook.Ingredient.name, cook.Ingredient.ingredient_id).all()
 
 
 # Charger un modèle NLP anglais
