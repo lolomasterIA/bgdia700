@@ -41,8 +41,7 @@ def setup_logging():
     logger.setLevel(logging.DEBUG)
 
     # Clear existing handlers to prevent duplication
-    if logger.hasHandlers():
-        logger.handlers.clear()
+    logger.handlers.clear()
 
     # Create a handler for the debug log file
     debug_handler = logging.FileHandler("logs/debug.log")
