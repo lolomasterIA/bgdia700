@@ -10,6 +10,10 @@ __pycache__/
 # C extensions
 *.so
 
+# Exclure les dossiers de configuration spécifiques à l'utilisateur
+.vscode/
+.idea/
+
 # Distribution / packaging
 .Python
 build/
