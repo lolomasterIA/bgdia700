@@ -25,10 +25,15 @@ def recipe_number_ingredient(session):
     """
     Compte le nombre de recettes contenant un nombre spécifique d'ingrédients.
 
-    Paramètres:
-    - session : SQLAlchemy session pour la base de données.
-    Retourne:
-    - dict : Dictionnaire contenant le nombre de recettes pour chaque nombre d'ingrédients (jusqu'à 40).
+    Paramètres
+    ----------
+    session : Session
+        La session SQLAlchemy pour la base de données.
+
+    Retourne
+    -------
+    dict
+        Un dictionnaire contenant le nombre de recettes pour chaque nombre d'ingrédients (jusqu'à 40).
     """
     recipe = dict()
     i = 1
@@ -42,12 +47,17 @@ def top_ingredient_used(session, n):
     """
     Récupère les n ingrédients les plus utilisés dans les recettes.
 
-    Paramètres:
-    - session : SQLAlchemy session pour la base de données.
-    - n : Nombre d'ingrédients les plus utilisés à retourner.
+    Paramètres
+    ----------
+    session : Session
+        La session SQLAlchemy pour la base de données.
+    n : int
+        Nombre d'ingrédients les plus utilisés à retourner.
 
-    Retourne:
-    - list : Liste des n ingrédients les plus utilisés avec leur nombre de recettes.
+    Retourne
+    --------
+    list
+        Liste des n ingrédients les plus utilisés avec leur nombre de recettes.
     """
     results = (
         session.query(
@@ -73,11 +83,15 @@ def top_ingredient_rating(session):
     """
     Récupère les ingrédients avec les meilleures notes moyennes et le plus de reviews.
 
-    Paramètres:
-    - session : SQLAlchemy session pour la base de données.
+    Paramètres
+    ----------
+    session : Session
+        La session SQLAlchemy pour la base de données.
 
-    Retourne:
-    - tuple : Deux dictionnaires, un pour les notes moyennes et un pour le nombre de reviews par ingrédient.
+    Retourne
+    --------
+    tuple
+        Deux dictionnaires, un pour les notes moyennes et un pour le nombre de reviews par ingrédient.
     """
     results = (
         session.query(
@@ -132,16 +146,23 @@ def generate_cluster_recipe(
     - les recettes avec moins de 15 reviews,
     - les ingrédients qui apparaissent dans moins de 5 recettes et les ingrédients / recettes associés.
 
-    Paramètres:
-    - session : SQLAlchemy session pour la base de données.
-    - matrix_type: Type de matrice à utiliser ("tfidf", "count").
-    - reduction_type: Réduction de dimensionnalité à appliquer ("pca", "svd").
-    - clustering_type: Algorithme de clusterisation à utiliser ("kmeans", "dbscan", "agglomerative").
-    - n_components: Nombre de dimensions pour la réduction.
-    - nb_cluster: Nombre de clusters (pour KMeans ou AgglomerativeClustering).
+    Paramètres
+    ----------
+    session : Session
+        La session SQLAlchemy pour la base de données.
+    matrix_type : str
+        Type de matrice à utiliser ("tfidf", "count").
+    reduction_type : str
+        Réduction de dimensionnalité à appliquer ("pca", "svd").
+    clustering_type : str
+        Algorithme de clusterisation à utiliser ("kmeans", "dbscan", "agglomerative").
+    n_components : int
+        Nombre de dimensions pour la réduction.
+    nb_cluster : int
+        Nombre de clusters (pour KMeans ou AgglomerativeClustering).
 
-    Retourne:
-    -------
+    Retourne
+    --------
     pd.DataFrame
         DataFrame contenant les recettes, les clusters, et les coordonnées PCA pour visualisation.
     int
@@ -237,19 +258,26 @@ def generate_kmeans_ingredient(session, nb_cluster):
     """
     Effectue une clusterisation des ingrédients en fonction de leur utilisation dans les recettes.
 
-    réduction du dataset, on enlève :
+    Réduction du dataset, on enlève :
     - les recettes avec moins de 3 ingrédients,
     - les recettes avec moins de 20 reviews,
     - les ingrédients qui apparaissent dans moins de 5 recettes et les ingrédients / recettes associés.
 
-    Paramètres:
-    - session : SQLAlchemy session pour la base de données.
-    - nb_cluster : Nombre de clusters pour la clusterisation.
+    Paramètres
+    ----------
+    session : Session
+        La session SQLAlchemy pour la base de données.
+    nb_cluster : int
+        Nombre de clusters pour la clusterisation.
 
-    Retourne:
-    - pd.DataFrame : DataFrame contenant les ingrédients, les clusters, et les coordonnées PCA pour visualisation.
-    - le nombre de recette
-    - le nombre d'ingrédient
+    Retourne
+    --------
+    pd.DataFrame
+        DataFrame contenant les ingrédients, les clusters, et les coordonnées PCA pour visualisation.
+    int
+        Le nombre de recettes.
+    int
+        Le nombre d'ingrédients.
     """
     results = (
         session.query(
@@ -318,16 +346,20 @@ def generate_matrice_ingredient(session):
     """
     Renvoie une matrice de co-occurence des ingrédients dans les recettes.
 
-    réduction du dataset, on enlève :
+    Réduction du dataset, on enlève :
     - les recettes avec moins de 3 ingrédients,
     - les recettes avec moins de 20 reviews,
     - les ingrédients qui apparaissent dans moins de 5 recettes et les ingrédients / recettes associés.
 
-    Paramètres:
-    - session : SQLAlchemy session pour la base de données.
+    Paramètres
+    ----------
+    session : Session
+        La session SQLAlchemy pour la base de données.
 
-    Retourne:
-    - pd.DataFrame : dataframe contenant la matrice de co occurence
+    Retourne
+    --------
+    pd.DataFrame
+        DataFrame contenant la matrice de co-occurence.
     """
     results = (
         session.query(
@@ -387,9 +419,17 @@ def suggestingredients(co_occurrence_matrix, ingredient, top_n=5):
     """
     Suggère des ingrédients qui vont bien avec l'ingrédient donné.
 
-    :param ingredient: Nom de l'ingrédient sélectionné.
-    :param top_n: Nombre de suggestions à retourner.
-    :return: Liste des meilleurs ingrédients suggérés.
+    Paramètres
+    ----------
+    ingredient : str
+        Nom de l'ingrédient sélectionné.
+    top_n : int
+        Nombre de suggestions à retourner.
+
+    Retourne
+    --------
+    list
+        Liste des meilleurs ingrédients suggérés.
     """
 
     # Récupère les occurrences associées à l'ingrédient
@@ -405,9 +445,17 @@ def get_ingredient_rating(session, ingredient_name):
     """
     Récupère la note moyenne (rating) d'un ingrédient en fonction de sum_rating et count_review.
 
-    :param session: La session SQLAlchemy active.
-    :param ingredient_id: L'identifiant de l'ingrédient.
-    :return: La note moyenne de l'ingrédient (float), ou None si les données ne sont pas disponibles.
+    Paramètres
+    ----------
+    session : Session
+        La session SQLAlchemy active.
+    ingredient_id : int
+        L'identifiant de l'ingrédient.
+
+    Retourne
+    --------
+    float
+        La note moyenne de l'ingrédient, ou None si les données ne sont pas disponibles.
     """
     result = (
         session.query(
@@ -437,19 +485,25 @@ def get_ingredient_rating(session, ingredient_name):
 
 def generate_regression_ingredient(session, model="rl"):
     """
-    Renvoie les résultats d'un régression linéaire sur le rating des ingrédient en fonction de la 'complexité de la recette.
+    Renvoie les résultats d'une régression linéaire sur le rating des ingrédients en fonction de la complexité de la recette.
 
-    réduction du dataset, on enlève :
+    Réduction du dataset, on enlève :
     - les recettes avec moins de 3 ingrédients,
     - les recettes avec moins de 20 reviews,
-    - les ingrédients qui apparaissent dans moins de 5 recettes et les ingrédients / recettes associés.
-    - les ingrédients avec minutes > 600
-    Paramètres:
-    - session : SQLAlchemy session pour la base de données.
-    - model : type de model = 'rl', 'xgb' ou 'rf'
+    - les ingrédients qui apparaissent dans moins de 5 recettes et les ingrédients / recettes associés,
+    - les ingrédients avec minutes > 600.
 
-    Retourne:
-    - mse, r2 et les coefficients (si existants) du modèle
+    Paramètres
+    ----------
+    session : Session
+        La session SQLAlchemy pour la base de données.
+    model : str
+        Type de modèle à utiliser ('rl', 'xgb' ou 'rf').
+
+    Retourne
+    --------
+    tuple
+        mse, r2 et les coefficients (si existants) du modèle.
     """
     results = (
         session.query(
@@ -566,15 +620,23 @@ def generate_regression_minutes(session, model="rl", selected_method="DeleteQ1Q3
     - Ingrédients apparaissant dans moins de 5 recettes
     - Recettes avec un temps > 600 minutes
 
-    Paramètres:
-    - session : SQLAlchemy session pour la base de données.
-    - model : type de modèle ("rl", "xgb", "rf")
+    Paramètres
+    ----------
+    session : Session
+        La session SQLAlchemy pour la base de données.
+    model : str
+        Type de modèle à utiliser ("rl", "xgb", "rf").
 
-    Retourne:
-    - mse : Mean Squared Error
-    - r2 : R²
-    - coefficients : Les coefficients si le modèle est linéaire (None sinon)
-    - df_results : DataFrame enrichi avec les prédictions
+    Retourne
+    --------
+    mse : float
+        Mean Squared Error.
+    r2 : float
+        R².
+    coefficients : list or None
+        Les coefficients si le modèle est linéaire (None sinon).
+    df_results : pd.DataFrame
+        DataFrame enrichi avec les prédictions.
     """
     # Récupérer les données depuis la base
     results = session.query(
@@ -647,14 +709,21 @@ def generate_regression_minutes(session, model="rl", selected_method="DeleteQ1Q3
 
 def delete_outliers(df, key, method, **kwargs):
     """
-    Supprime différente entrée de la clé en fonction de la méthode.
+    Supprime différentes entrées de la clé en fonction de la méthode.
 
-    Paramètres:
-    - df : jeux de données
-    - key : paramètre surlequel faire la réduction
-    - method : ="DeleteQ1Q3", "Capping", "Log", "Isolation Forest", "DBScan", "Local Outlier Factor"
+    Paramètres
+    ----------
+    df : pd.DataFrame
+        Jeu de données.
+    key : str
+        Paramètre sur lequel faire la réduction.
+    method : str
+        Méthode à utiliser ("DeleteQ1Q3", "Capping", "Log", "Isolation Forest", "DBScan", "Local Outlier Factor").
 
-    Retourne : le dataset réduit.
+    Retourne
+    --------
+    pd.DataFrame
+        Le dataset réduit.
     """
 
     if method == "DeleteQ1Q3":

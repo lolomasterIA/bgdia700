@@ -20,8 +20,10 @@ def load_environment():
     """
     Charge les variables d'environnement à partir d'un fichier .env.
 
-    Retourne:
-        dict: Un dictionnaire contenant les variables d'environnement pour la base de données.
+    Retourne
+    --------
+    dict
+        Un dictionnaire contenant les variables d'environnement pour la base de données.
     """
     load_dotenv()
     return {
@@ -36,11 +38,15 @@ def create_db_engine(env):
     """
     Crée et retourne un moteur de base de données SQLAlchemy.
 
-    Paramètres:
-        env (dict): Un dictionnaire contenant les informations de connexion à la base de données.
+    Paramètres
+    ----------
+    env : dict
+        Un dictionnaire contenant les informations de connexion à la base de données.
 
-    Retourne:
-        sqlalchemy.engine.Engine: Un moteur de base de données SQLAlchemy.
+    Retourne
+    --------
+    sqlalchemy.engine.Engine
+        Un moteur de base de données SQLAlchemy.
     """
     DATABASE_URL = f"postgresql://{env['DB_USER']}:{env['DB_PASS']}@{env['DB_HOST']}:5432/{env['DB_NAME']}"
     engine = create_engine(DATABASE_URL)

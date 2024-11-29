@@ -16,8 +16,10 @@ def generate_layout():
     """
     Configure et génère la mise en page principale de l'application Streamlit.
 
-    Retourne:
-    - tuple : Contient le menu sélectionné et les objets de colonne pour structurer le contenu dans des sections.
+    Retourne
+    --------
+    tuple
+        Contient le menu sélectionné et les objets de colonne pour structurer le contenu dans des sections.
     """
     # Configurer la page pour un affichage en pleine largeur
     st.set_page_config(
@@ -72,8 +74,10 @@ def display_cluster_recipe(df_recipes_ingredients):
     """
     Affiche les clusters d'ingrédients en fonction des recettes sous forme de graphique interactif.
 
-    Paramètres:
-    - df_recipes_ingredients : DataFrame contenant les informations de clusterisation et les coordonnées PCA.
+    Paramètres
+    ----------
+    df_recipes_ingredients : pd.DataFrame
+        DataFrame contenant les informations de clusterisation et les coordonnées PCA.
 
     Cette fonction génère un graphique de dispersion où chaque point représente un ingrédient, coloré selon le cluster.
     """
@@ -93,8 +97,10 @@ def display_kmeans_ingredient(df_recipes_ingredients):
     """
     Affiche les clusters d'ingrédients en fonction des recettes sous forme de graphique interactif.
 
-    Paramètres:
-    - df_recipes_ingredients : DataFrame contenant les informations de clusterisation et les coordonnées PCA.
+    Paramètres
+    ----------
+    df_recipes_ingredients : pd.DataFrame
+        DataFrame contenant les informations de clusterisation et les coordonnées PCA.
 
     Cette fonction génère un graphique de dispersion où chaque point représente un ingrédient, coloré selon le cluster.
     """
@@ -111,11 +117,14 @@ def display_kmeans_ingredient(df_recipes_ingredients):
 
 def display_cloud_ingredient(co_occurrence_matrix, selected_ingredient):
     """
-    Tentative d'afficher un ingredient avec la distance des autres ingrédients.
+    Affiche un ingrédient avec la distance des autres ingrédients.
 
-    Paramètres:
-    - co_occurrence_matrix: np.array des co occurrences des ingrédients
-    - selected_ingredient: l'ingredient à comparer
+    Paramètres
+    ----------
+    co_occurrence_matrix : np.array
+        Matrice de co-occurrences des ingrédients.
+    selected_ingredient : str
+        L'ingrédient à comparer.
     """
     # Extraire les co-occurrences de l'ingrédient sélectionné
     co_occurrences = co_occurrence_matrix.loc[selected_ingredient]
@@ -145,8 +154,10 @@ def display_rating_ingredientbyfeature(df_results):
     """
     Affiche un scatter plot 3D interactif avec Streamlit.
 
-    Arguments :
-    - df_results : DataFrame contenant les colonnes 'minutes', 'n_steps', 'n_ingredients', et 'rating'.
+    Paramètres
+    ----------
+    df_results : pd.DataFrame
+        DataFrame contenant les colonnes 'minutes', 'n_steps', 'n_ingredients', et 'rating'.
     """
 
     # Création de la figure
@@ -182,8 +193,10 @@ def display_minutes_byfeature(df_results):
     """
     Affiche un scatter plot 3D interactif avec Streamlit.
 
-    Arguments :
-    - df_results : DataFrame contenant les colonnes 'minutes', 'n_steps', 'n_ingredients', et 'len_steps'.
+    Paramètres
+    ----------
+    df_results : pd.DataFrame
+        DataFrame contenant les colonnes 'minutes', 'n_steps', 'n_ingredients', et 'len_steps'.
     """
 
     # Création de la figure
