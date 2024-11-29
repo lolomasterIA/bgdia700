@@ -52,6 +52,17 @@ def lemmatize_name(name):
     return lemmatized
 
 
+def oneword_ingredient(session):
+    query = session.query(cook.Ingredient.name).filter(
+        cook.Ingredient.name.op('~')('^[^ ]+$'))
+    return query.all()
+
+
+def all_ingredient(session):
+    query = session.query(cook.Ingredient.name, cook.Ingredient.ingredient_id)
+    return query.all()
+
+
 # Traiter les résultats
 lem_results = [
     {"ingredient_id": ingredient_id, "lem_name": lemmatize_name(name)}
