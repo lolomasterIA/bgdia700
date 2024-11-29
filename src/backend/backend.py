@@ -52,8 +52,7 @@ def top_ingredient_used(session, n):
     results = (
         session.query(
             cook.Ingredient.name,
-            func.count(cook.recipe_ingredient.c.recipe_id).label(
-                "recipe_count"),
+            func.count(cook.recipe_ingredient.c.recipe_id).label("recipe_count"),
         )
         .join(
             cook.recipe_ingredient,
@@ -64,8 +63,7 @@ def top_ingredient_used(session, n):
     )
 
     # Trier les résultats par nombre de recettes en ordre décroissant
-    nbingredientsrecettes_trie = sorted(
-        results, key=lambda x: x[1], reverse=True)
+    nbingredientsrecettes_trie = sorted(results, key=lambda x: x[1], reverse=True)
 
     # Récupérer les n premiers ingrédients
     return nbingredientsrecettes_trie[:n]
@@ -186,8 +184,7 @@ def generate_cluster_recipe(
     # Nombre total de recettes
     nombre_total_recettes = df_recipes_ingredients["id_recipe"].nunique()
     # Nombre total d'ingrédients (en considérant les ingrédients uniques dans toutes les recettes)
-    nombre_total_ingredients = df_recipes_ingredients["ingredients"].explode(
-    ).nunique()
+    nombre_total_ingredients = df_recipes_ingredients["ingredients"].explode().nunique()
 
     # Avec CountVectorizer et tfidf
     if matrix_type == "tfidf":
@@ -303,15 +300,12 @@ def generate_kmeans_ingredient(session, nb_cluster):
     for ingredients_list in df_recipes_ingredients["ingredients"]:
         for i in range(len(ingredients_list)):
             for j in range(i + 1, len(ingredients_list)):
-                co_occurrence_matrix.loc[ingredients_list[i],
-                                         ingredients_list[j]] += 1
-                co_occurrence_matrix.loc[ingredients_list[j],
-                                         ingredients_list[i]] += 1
+                co_occurrence_matrix.loc[ingredients_list[i], ingredients_list[j]] += 1
+                co_occurrence_matrix.loc[ingredients_list[j], ingredients_list[i]] += 1
 
     # Clustering avec KMeans basé sur la similarité cosinus
     similarity_matrix = cosine_similarity(co_occurrence_matrix)
-    kmeans = KMeans(n_clusters=nb_cluster,
-                    random_state=0).fit(similarity_matrix)
+    kmeans = KMeans(n_clusters=nb_cluster, random_state=0).fit(similarity_matrix)
 
     # Visualisation des clusters après réduction de dimension
     pca = PCA(n_components=2)
@@ -384,10 +378,8 @@ def generate_matrice_ingredient(session):
     for ingredients_list in df_recipes_ingredients["ingredients"]:
         for i in range(len(ingredients_list)):
             for j in range(i + 1, len(ingredients_list)):
-                co_occurrence_matrix.loc[ingredients_list[i],
-                                         ingredients_list[j]] += 1
-                co_occurrence_matrix.loc[ingredients_list[j],
-                                         ingredients_list[i]] += 1
+                co_occurrence_matrix.loc[ingredients_list[i], ingredients_list[j]] += 1
+                co_occurrence_matrix.loc[ingredients_list[j], ingredients_list[i]] += 1
     return co_occurrence_matrix, all_ingredients
 
 
@@ -469,26 +461,41 @@ def generate_regression_ingredient(session, model="rl"):
             cook.Recipe.n_ingredients,
             func.char_length(cook.Recipe.steps).label("len_steps"),
             func.char_length(cook.Recipe.description).label("len_description"),
-            (cook.Ingredient.sum_rating / cook.Ingredient.count_review).label("rating")
+            (cook.Ingredient.sum_rating / cook.Ingredient.count_review).label("rating"),
         )
-        .join(cook.recipe_ingredient, cook.Recipe.recipe_id == cook.recipe_ingredient.c.recipe_id)
-        .join(cook.Ingredient, cook.recipe_ingredient.c.ingredient_id == cook.Ingredient.ingredient_id)
+        .join(
+            cook.recipe_ingredient,
+            cook.Recipe.recipe_id == cook.recipe_ingredient.c.recipe_id,
+        )
+        .join(
+            cook.Ingredient,
+            cook.recipe_ingredient.c.ingredient_id == cook.Ingredient.ingredient_id,
+        )
         .filter(
             cook.Recipe.n_ingredients > 3,
             cook.Ingredient.count_review > 15,
             cook.Ingredient.nb_recette > 5,
             cook.Recipe.minutes < 600,
             cook.Recipe.minutes < 600,
-            (cook.Ingredient.sum_rating / cook.Ingredient.count_review) > 4
+            (cook.Ingredient.sum_rating / cook.Ingredient.count_review) > 4,
         )
         .all()
     )
-    df_results = pd.DataFrame(results, columns=[
-        "ingredient_id", "recipe_id", "minutes", "n_steps", "sum_rating",
-        "n_ingredients", "len_steps", "len_description", "rating"
-    ])
-    features = ["minutes", "n_steps", "n_ingredients",
-                "len_steps", "len_description"]
+    df_results = pd.DataFrame(
+        results,
+        columns=[
+            "ingredient_id",
+            "recipe_id",
+            "minutes",
+            "n_steps",
+            "sum_rating",
+            "n_ingredients",
+            "len_steps",
+            "len_description",
+            "rating",
+        ],
+    )
+    features = ["minutes", "n_steps", "n_ingredients", "len_steps", "len_description"]
     target = "rating"
 
     # Préparation des données
@@ -497,7 +504,8 @@ def generate_regression_ingredient(session, model="rl"):
 
     # Division en ensembles d'entraînement et de test
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42)
+        X, y, test_size=0.2, random_state=42
+    )
 
     # modèle régression linéaire
     if model == "rl":
@@ -515,10 +523,7 @@ def generate_regression_ingredient(session, model="rl"):
         r2 = r2_score(y_test, y_pred)
 
         # Affichage des coefficients
-        coefficients = pd.DataFrame({
-            "Feature": features,
-            "Coefficient": model.coef_
-        })
+        coefficients = pd.DataFrame({"Feature": features, "Coefficient": model.coef_})
 
     # modèle Gradient Boosting
     if model == "xgb":
@@ -572,23 +577,27 @@ def generate_regression_minutes(session, model="rl", selected_method="DeleteQ1Q3
     - df_results : DataFrame enrichi avec les prédictions
     """
     # Récupérer les données depuis la base
-    results = (
-        session.query(
-            cook.Recipe.recipe_id,
-            cook.Recipe.minutes,
-            cook.Recipe.n_steps,
-            cook.Recipe.n_ingredients,
-            func.char_length(cook.Recipe.steps).label("len_steps"),
-            func.char_length(cook.Recipe.description).label("len_description"),
-        )
-        .all()
-    )
+    results = session.query(
+        cook.Recipe.recipe_id,
+        cook.Recipe.minutes,
+        cook.Recipe.n_steps,
+        cook.Recipe.n_ingredients,
+        func.char_length(cook.Recipe.steps).label("len_steps"),
+        func.char_length(cook.Recipe.description).label("len_description"),
+    ).all()
 
     # Conversion des résultats en DataFrame
-    df = pd.DataFrame(results, columns=[
-        "recipe_id", "minutes", "n_steps",
-        "n_ingredients", "len_steps", "len_description"
-    ])
+    df = pd.DataFrame(
+        results,
+        columns=[
+            "recipe_id",
+            "minutes",
+            "n_steps",
+            "n_ingredients",
+            "len_steps",
+            "len_description",
+        ],
+    )
     df_results = delete_outliers(df, "minutes", selected_method)
 
     # Variables indépendantes et cible
@@ -612,10 +621,7 @@ def generate_regression_minutes(session, model="rl", selected_method="DeleteQ1Q3
         y_pred = model.predict(X_test)
         mse = mean_squared_error(y_test, y_pred)
         r2 = r2_score(y_test, y_pred)
-        coefficients = pd.DataFrame({
-            "Feature": features,
-            "Coefficient": model.coef_
-        })
+        coefficients = pd.DataFrame({"Feature": features, "Coefficient": model.coef_})
     elif model == "xgb":
         # Modèle de gradient boosting
         model = XGBRegressor(random_state=42)
@@ -631,8 +637,7 @@ def generate_regression_minutes(session, model="rl", selected_method="DeleteQ1Q3
         mse = mean_squared_error(y_test, y_pred)
         r2 = r2_score(y_test, y_pred)
     else:
-        raise ValueError(
-            "Modèle non reconnu : choisissez 'rl', 'xgb' ou 'rf'.")
+        raise ValueError("Modèle non reconnu : choisissez 'rl', 'xgb' ou 'rf'.")
 
     # Ajout des prédictions au DataFrame
     df_results["predicted_minutes"] = model.predict(X)
@@ -640,7 +645,7 @@ def generate_regression_minutes(session, model="rl", selected_method="DeleteQ1Q3
     return mse, r2, coefficients, df_results
 
 
-def delete_outliers(df, key="minutes", method="deletQ1Q3"):
+def delete_outliers(df, key, method, **kwargs):
     """
     Supprime différente entrée de la clé en fonction de la méthode.
 
@@ -658,31 +663,36 @@ def delete_outliers(df, key="minutes", method="deletQ1Q3"):
         IQR = Q3 - Q1
         lower_bound = Q1 - 1.5 * IQR
         upper_bound = Q3 + 1.5 * IQR
-        df = df[(df[key] >= lower_bound) &
-                (df[key] <= upper_bound)]
+        df = df[(df[key] >= lower_bound) & (df[key] <= upper_bound)]
     elif method == "Capping":
         Q1 = df[key].quantile(0.25)
         Q3 = df[key].quantile(0.75)
         IQR = Q3 - Q1
         lower_bound = Q1 - 1.5 * IQR
         upper_bound = Q3 + 1.5 * IQR
-        df[key] = df[key].clip(
-            lower=lower_bound, upper=upper_bound)
+        df[key] = df[key].clip(lower=lower_bound, upper=upper_bound)
     elif method == "Log":
         df[key] = np.log1p(df[key])
     elif method == "Isolation Forest":
-        iso = IsolationForest(contamination=0.01, random_state=42)
+        iso = IsolationForest(
+            contamination=kwargs.get("contamination", 0.01), random_state=42
+        )
         outliers = iso.fit_predict(df[["minutes", "n_steps", "n_ingredients"]])
-        df["is_outlier"] = (outliers == -1)
-        df = df[df["is_outlier"] is False].drop(columns=["is_outlier"])
+        df["is_outlier"] = outliers == -1
+        df = df[~df["is_outlier"]].drop(columns=["is_outlier"])
     elif method == "DBScan":
-        db = DBSCAN(eps=3, min_samples=5)
+        db = DBSCAN(eps=kwargs.get("eps", 3), min_samples=kwargs.get("min_samples", 5))
         labels = db.fit_predict(df[["minutes", "n_steps"]])
-        df["is_outlier"] = (labels == -1)
-        df = df[df["is_outlier"] is False].drop(columns=["is_outlier"])
+        df["is_outlier"] = labels == -1
+        df = df[~df["is_outlier"]].drop(columns=["is_outlier"])
     elif method == "Local Outlier Factor":
-        lof = LocalOutlierFactor(n_neighbors=20, contamination=0.01)
+        lof = LocalOutlierFactor(
+            n_neighbors=kwargs.get("n_neighbors", 20),
+            contamination=kwargs.get("contamination", 0.01),
+        )
         outliers = lof.fit_predict(df[["minutes", "n_steps"]])
-        df["is_outlier"] = (outliers == -1)
-        df = df[df["is_outlier"] is False].drop(columns=["is_outlier"])
+        df["is_outlier"] = outliers == -1
+        df = df[~df["is_outlier"]].drop(columns=["is_outlier"])
+    else:
+        raise ValueError(f"Unknown method: {method}")
     return df

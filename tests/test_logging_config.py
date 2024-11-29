@@ -1,6 +1,5 @@
 import pytest
 import logging
-import os
 from unittest.mock import patch, MagicMock
 from src.logging_config import setup_logging
 
