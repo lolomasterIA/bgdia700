@@ -73,7 +73,7 @@ def generate_layout():
         list-style-type: decimal;
     }
     li {
-        margin-bottom: 5px;        
+        margin-bottom: 5px;
         margin: 0;
     }
     .main > div {
@@ -109,7 +109,6 @@ def generate_layout():
     }
     menu = st_navbar(
         ["Généralité", "Clusterisation", "Ingrédients qui vont bien ensemble", "Corrélation rating ingrédient", "Corrélation minutes"], styles=stylesmenu, adjust=False)
-
 
     # Zone principale de contenu
     st.header(menu)
