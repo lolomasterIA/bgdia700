@@ -179,13 +179,15 @@ reviewer_recipe_review = Table(
     Column("reviewer_id", Integer, ForeignKey("reviewer.reviewer_id")),
     Column("recipe_id", Integer, ForeignKey("recipe.recipe_id")),
     Column("review_id", Integer, ForeignKey("review.review_id")),
-    PrimaryKeyConstraint("reviewer_id", "recipe_id", "review_id"),  # Clé composite
+    PrimaryKeyConstraint("reviewer_id", "recipe_id",
+                         "review_id"),  # Clé composite
 )
 
 contributor_recipe = Table(
     "contributor_recipe",
     Base.metadata,
-    Column("contributor_id", Integer, ForeignKey("contributor.contributor_id")),
+    Column("contributor_id", Integer, ForeignKey(
+        "contributor.contributor_id")),
     Column("recipe_id", Integer, ForeignKey("recipe.recipe_id")),
     PrimaryKeyConstraint("contributor_id", "recipe_id"),
 )
@@ -335,6 +337,7 @@ class Ingredient(Base, BaseModel):
     nb_recette = Column(Integer)
     sum_rating = Column(Integer)
     count_review = Column(Integer)
+    name_one_word = Column(String(255))
 
     # Relation avec Recipe via la table recipe_ingredient (table déjà existante)
     recipes = relationship(
@@ -368,6 +371,7 @@ class Ingredient(Base, BaseModel):
                 self.nb_recette = ingredient.nb_recette
                 self.sum_rating = ingredient.sum_rating
                 self.count_review = ingredient.count_review
+                self.name_one_word = ingredient.name_one_word
         else:
             for key, value in kwargs.items():
                 setattr(self, key, value)
