@@ -43,20 +43,20 @@ def test_recipe_number_ingredient(session, mock_data):
     assert len(result) == 40
 
 
-def test_top_ingredient_used(session, mock_data):
+def test_top_ingredient_used(session, mock_data, data_type="One word"):
     # Mock la requête SQLAlchemy
     session.query().join().group_by().all.return_value = [
         ("Ingredient 1", 10),
         ("Ingredient 2", 20),
         ("Ingredient 3", 5),
     ]
-    result = backend.top_ingredient_used(session, 2)
+    result = backend.top_ingredient_used(session, 2, data_type)
     assert isinstance(result, list)
     assert len(result) == 2
     assert result[0][0] == "Ingredient 2"
 
 
-def test_top_ingredient_rating(session, mock_data):
+def test_top_ingredient_rating(session, mock_data, data_type="One word"):
     # Définir un namedtuple pour simuler les résultats de la requête SQLAlchemy
     IngredientRating = namedtuple(
         "IngredientRating", ["name", "review_count", "average_rating"]
@@ -68,16 +68,18 @@ def test_top_ingredient_rating(session, mock_data):
         IngredientRating("Ingredient 2", 20, 3.0),
         IngredientRating("Ingredient 3", 5, 5.0),
     ]
-    avg_rating, review_count = backend.top_ingredient_rating(session)
+    avg_rating, review_count = backend.top_ingredient_rating(
+        session, data_type)
     assert isinstance(avg_rating, dict)
     assert isinstance(review_count, dict)
     assert avg_rating["Ingredient 3"] == 5.0
     assert review_count["Ingredient 2"] == 20
 
 
-def test_generate_cluster_recipe(session):
+def test_generate_cluster_recipe(session, data_type="One word"):
     # Mock des données pour simuler la base de données
-    RecipeIngredients = namedtuple("RecipeIngredients", ["name", "ingredients"])
+    RecipeIngredients = namedtuple(
+        "RecipeIngredients", ["name", "ingredients"])
     session.query().join().join().group_by().where().all.return_value = [
         RecipeIngredients("Recipe 1", ["Ingredient 1", "Ingredient 2"]),
         RecipeIngredients("Recipe 2", ["Ingredient 2", "Ingredient 3"]),
@@ -96,6 +98,7 @@ def test_generate_cluster_recipe(session):
                         clustering_type=clustering_type,
                         n_components=2,
                         nb_cluster=2,
+                        data_type,
                     )
                 )
 
@@ -126,6 +129,7 @@ def test_generate_cluster_recipe(session):
             clustering_type="kmeans",
             n_components=2,
             nb_cluster=2,
+            data_type="One word"
         )
 
     # Cas : type de cluster invalide
@@ -137,6 +141,7 @@ def test_generate_cluster_recipe(session):
             clustering_type="invalid",
             n_components=2,
             nb_cluster=2,
+            data_type="One word"
         )
 
     # Cas : type de réduction invalide
@@ -148,12 +153,14 @@ def test_generate_cluster_recipe(session):
             clustering_type="kmeans",
             n_components=2,
             nb_cluster=2,
+            data_type="One word"
         )
 
 
-def test_generate_kmeans_ingredient(session, mock_data):
+def test_generate_kmeans_ingredient(session, mock_data, data_type="One word"):
     # Définir un namedtuple pour simuler les résultats de la requête SQLAlchemy
-    RecipeIngredients = namedtuple("RecipeIngredients", ["recipe_id", "ingredients"])
+    RecipeIngredients = namedtuple(
+        "RecipeIngredients", ["recipe_id", "ingredients"])
 
     # Mock la requête SQLAlchemy
     session.query().join().join().group_by().where().all.return_value = [
@@ -161,7 +168,7 @@ def test_generate_kmeans_ingredient(session, mock_data):
         RecipeIngredients(2, ["Ingredient 2", "Ingredient 3"]),
     ]
     reduced_data, all_ingredients, kmeans = backend.generate_kmeans_ingredient(
-        session, 2
+        session, 2, data_type
     )
     assert isinstance(reduced_data, np.ndarray)
     assert isinstance(all_ingredients, list)
@@ -169,8 +176,9 @@ def test_generate_kmeans_ingredient(session, mock_data):
     assert kmeans.n_clusters == 2
 
 
-def test_generate_matrice_ingredient(session, mock_data):
-    RecipeIngredients = namedtuple("RecipeIngredients", ["recipe_id", "ingredients"])
+def test_generate_matrice_ingredient(session, mock_data, data_type="One word"):
+    RecipeIngredients = namedtuple(
+        "RecipeIngredients", ["recipe_id", "ingredients"])
 
     # Mock la requête SQLAlchemy
     session.query().join().join().group_by().where().all.return_value = [
@@ -178,7 +186,8 @@ def test_generate_matrice_ingredient(session, mock_data):
         RecipeIngredients(2, ["Ingredient 2", "Ingredient 3"]),
     ]
 
-    co_occurrence_matrix, all_ingredients = backend.generate_matrice_ingredient(session)
+    co_occurrence_matrix, all_ingredients = backend.generate_matrice_ingredient(
+        session, data_type)
 
     assert isinstance(co_occurrence_matrix, pd.DataFrame)
     assert isinstance(all_ingredients, list)
@@ -195,7 +204,8 @@ def test_suggestingredients(session, mock_data):
             "Ingredient 3": {"Ingredient 1": 3, "Ingredient 2": 8, "Ingredient 3": 0},
         }
     )
-    result = backend.suggestingredients(co_occurrence_matrix, "Ingredient 2", top_n=2)
+    result = backend.suggestingredients(
+        co_occurrence_matrix, "Ingredient 2", top_n=2)
     assert isinstance(result, list)
     assert len(result) == 2
     assert (
@@ -204,11 +214,12 @@ def test_suggestingredients(session, mock_data):
     assert result[0][1] == 8  # Vérifier le score
 
 
-def test_get_ingredient_rating(session):
+def test_get_ingredient_rating(session, data_type="One word"):
     # Mock la requête SQLAlchemy
-    session.query().filter().first.return_value = namedtuple("Rating", ["rating"])(4.5)
+    session.query().filter().first.return_value = namedtuple(
+        "Rating", ["rating"])(4.5)
 
-    result = backend.get_ingredient_rating(session, "Ingredient 1")
+    result = backend.get_ingredient_rating(session, "Ingredient 1", data_type)
     assert isinstance(result, float)
     assert result == 4.5
 
@@ -340,17 +351,20 @@ def test_delete_outliers():
     df = pd.DataFrame(data)
 
     # Tester la méthode "DeleteQ1Q3"
-    df_reduced = backend.delete_outliers(df.copy(), key="minutes", method="DeleteQ1Q3")
+    df_reduced = backend.delete_outliers(
+        df.copy(), key="minutes", method="DeleteQ1Q3")
     assert len(df_reduced) == 5
     assert 1000 not in df_reduced["minutes"].values
 
     # Tester la méthode "Capping"
-    df_reduced = backend.delete_outliers(df.copy(), key="minutes", method="Capping")
+    df_reduced = backend.delete_outliers(
+        df.copy(), key="minutes", method="Capping")
     assert len(df_reduced) == 6
     assert 1000 not in df_reduced["minutes"].values
 
     # Tester la méthode "Log"
-    df_reduced = backend.delete_outliers(df.copy(), key="minutes", method="Log")
+    df_reduced = backend.delete_outliers(
+        df.copy(), key="minutes", method="Log")
     assert np.allclose(df_reduced["minutes"], np.log1p(df["minutes"]))
 
     # Tester la méthode "Isolation Forest" avec des paramètres ajustés
@@ -381,4 +395,5 @@ def test_delete_outliers():
 
     # Test for an unknown method
     with pytest.raises(ValueError):
-        backend.delete_outliers(df.copy(), key="minutes", method="Unknown Method")
+        backend.delete_outliers(df.copy(), key="minutes",
+                                method="Unknown Method")
