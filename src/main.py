@@ -73,8 +73,7 @@ if __name__ == "__main__":
         top_ingredient_used = backend.top_ingredient_used(session, 10)
         df_top_ingredient_used = pd.DataFrame(top_ingredient_used)
         df_top_ingredient_used = df_top_ingredient_used.rename(
-            columns={"name": "Ingrédient",
-                     "recipe_count": "Nombre de recettes"}
+            columns={"name": "Ingrédient", "recipe_count": "Nombre de recettes"}
         )
 
         # Notes moyennes et nombre de reviews pour chaque ingrédient
@@ -106,22 +105,19 @@ if __name__ == "__main__":
         with col1:
             # Affichage du top 10 des ingrédients les plus utilisés
             styled_top_10 = (
-                df_top_ingredient_used.style.highlight_max(
-                    axis=0, color="lightgreen")
+                df_top_ingredient_used.style.highlight_max(axis=0, color="lightgreen")
                 .highlight_min(axis=0, color="lightcoral")
                 .format({"Nombre": "{:.1f}%"})
             )
             st.subheader(
-                "Top 10 des ingrédients (total : " +
-                str(total_ingredient) + ")"
+                "Top 10 des ingrédients (total : " + str(total_ingredient) + ")"
             )
             st.dataframe(styled_top_10, use_container_width=True)
 
         with col2:
             # Création d'un graphique en barres pour visualiser le nombre de recettes en fonction du nombre d'ingrédients
             st.subheader(
-                "Nb recettes (total : " + str(total_recettes) +
-                ") / nb ingrédients"
+                "Nb recettes (total : " + str(total_recettes) + ") / nb ingrédients"
             )
             fig = px.bar(
                 x=nombre_ingredients,
@@ -214,14 +210,14 @@ if __name__ == "__main__":
             )
 
             st.text(
-                "Nombre d'ingrédients après filtres : " +
-                str(nombre_total_ingredients)
+                "Nombre d'ingrédients après filtres : " + str(nombre_total_ingredients)
             )
         with col2:
             frontend.display_cluster_recipe(df)
 
     elif menu == "Ingrédients qui vont bien ensemble":
         with col1:
+            # stokage en session de la grosse matrice pour ne pas la recalculer
             if "co_occurrence_matrix" not in st.session_state:
                 co_occurrence_matrix, all_ingredients = backend.generate_matrice_ingredient(
                     session)
@@ -230,19 +226,21 @@ if __name__ == "__main__":
             else:
                 co_occurrence_matrix = st.session_state.co_occurrence_matrix
                 all_ingredients = st.session_state.all_ingredients
+
             st.subheader("Suggestions d'Ingrédients")
+            
             # Liste des ingrédients
             selected_ingredient = st.selectbox(
                 "Sélectionnez un ingrédient pour obtenir des suggestions :",
-                options=all_ingredients, placeholder="cheese"
+                options=all_ingredients,
+                placeholder="cheese",
             )
             if selected_ingredient:
                 suggestions = backend.suggestingredients(
                     co_occurrence_matrix, selected_ingredient, top_n=5
                 )
                 if suggestions:
-                    st.write(
-                        f"Ingrédients qui vont bien avec '{selected_ingredient}':")
+                    st.write(f"Ingrédients qui vont bien avec '{selected_ingredient}':")
                     for ingredient, co_occurrence in suggestions:
                         st.write(
                             f"- {ingredient} : Note {backend.get_ingredient_rating(session, ingredient)} | {co_occurrence} occurrences"
@@ -252,20 +250,31 @@ if __name__ == "__main__":
         with col2:
             if selected_ingredient:
                 frontend.display_cloud_ingredient(
-                    co_occurrence_matrix, selected_ingredient)
+                    co_occurrence_matrix, selected_ingredient
+                )
     elif menu == "Corrélation minutes":
         with col1:
             selected_model = st.selectbox(
                 "Sélectionnez un modèle de prédiction :",
-                options=["rl", "xgb", "rf"], placeholder="rl"
+                options=["rl", "xgb", "rf"],
+                placeholder="rl",
             )
             selected_method = st.selectbox(
                 "Sélectionnez une méthode de nettoyage minutes",
-                options=["DeleteQ1Q3", "Capping", "Log", "Isolation Forest", "DBScan", "Local Outlier Factor"], placeholder="deleteQ1Q3"
+                options=[
+                    "DeleteQ1Q3",
+                    "Capping",
+                    "Log",
+                    "Isolation Forest",
+                    "DBScan",
+                    "Local Outlier Factor",
+                ],
+                placeholder="deleteQ1Q3",
             )
 
             mse, r2, coefficients, df_results = backend.generate_regression_minutes(
-                session, selected_model, selected_method)
+                session, selected_model, selected_method
+            )
             st.write(selected_method)
             st.write("mse = " + str(mse) + " / r2 = " + str(r2))
             st.write("nombre de recettes : " + str(len(df_results)))
@@ -278,11 +287,13 @@ if __name__ == "__main__":
         with col1:
             selected_model = st.selectbox(
                 "Sélectionnez un modèle de prédiction :",
-                options=["rl", "xgb", "rf"], placeholder="rl"
+                options=["rl", "xgb", "rf"],
+                placeholder="rl",
             )
 
             mse, r2, coefficients, df_results = backend.generate_regression_ingredient(
-                session, selected_model)
+                session, selected_model
+            )
             st.write("mse = " + str(mse) + " / r2 = " + str(r2))
             if coefficients is not None:
                 st.write(coefficients)

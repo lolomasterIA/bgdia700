@@ -110,12 +110,18 @@ def generate_layout():
     menu = st_navbar(
         ["Généralité", "Clusterisation", "Ingrédients qui vont bien ensemble", "Corrélation rating ingrédient", "Corrélation minutes"], styles=stylesmenu, adjust=False)
 
+
     # Zone principale de contenu
     st.header(menu)
 
     # Utilisation des colonnes pour diviser la zone centrale en plusieurs sections
     with st.container():
-        if menu == "Clusterisation" or menu == "Ingrédients qui vont bien ensemble" or menu == "Corrélation rating ingrédient" or menu == "Corrélation minutes":
+        if (
+            menu == "Clusterisation"
+            or menu == "Ingrédients qui vont bien ensemble"
+            or menu == "Corrélation rating ingrédient"
+            or menu == "Corrélation minutes"
+        ):
             col1, col2 = st.columns([1, 2])
         else:
             col1, col2 = st.columns(2)
@@ -196,7 +202,7 @@ def display_cloud_ingredient(co_occurrence_matrix, selected_ingredient):
         height=400,
         background_color="white",
         colormap="viridis",
-        max_words=200
+        max_words=200,
     ).generate_from_frequencies(word_frequencies)
 
     # Afficher le nuage de mots dans Streamlit
@@ -217,23 +223,28 @@ def display_rating_ingredientbyfeature(df_results):
 
     # Création de la figure
     fig = plt.figure(figsize=(12, 8))
-    ax = fig.add_subplot(111, projection='3d')
+    ax = fig.add_subplot(111, projection="3d")
 
     # Scatter plot
     scatter = ax.scatter(
-        df_results['minutes'], df_results['n_steps'], df_results['n_ingredients'],
-        c=df_results['rating'], cmap='coolwarm', s=50, alpha=0.7
+        df_results["minutes"],
+        df_results["n_steps"],
+        df_results["n_ingredients"],
+        c=df_results["rating"],
+        cmap="coolwarm",
+        s=50,
+        alpha=0.7,
     )
 
     # Labels
-    ax.set_xlabel('Minutes')
-    ax.set_ylabel('N Steps')
-    ax.set_zlabel('N Ingredients')
-    ax.set_title('Relation entre Minutes, N Steps, N Ingredients et Rating')
+    ax.set_xlabel("Minutes")
+    ax.set_ylabel("N Steps")
+    ax.set_zlabel("N Ingredients")
+    ax.set_title("Relation entre Minutes, N Steps, N Ingredients et Rating")
 
     # Ajouter une barre de couleur
     cbar = fig.colorbar(scatter, ax=ax, shrink=0.5)
-    cbar.set_label('Rating')
+    cbar.set_label("Rating")
 
     # Afficher la figure avec Streamlit
     st.pyplot(fig)
@@ -249,23 +260,28 @@ def display_minutes_byfeature(df_results):
 
     # Création de la figure
     fig = plt.figure(figsize=(12, 8))
-    ax = fig.add_subplot(111, projection='3d')
+    ax = fig.add_subplot(111, projection="3d")
 
     # Scatter plot
     scatter = ax.scatter(
-        df_results['n_steps'], df_results['n_ingredients'], df_results['len_steps'],
-        c=df_results['minutes'], cmap='coolwarm', s=50, alpha=0.7
+        df_results["n_steps"],
+        df_results["n_ingredients"],
+        df_results["len_steps"],
+        c=df_results["minutes"],
+        cmap="coolwarm",
+        s=50,
+        alpha=0.7,
     )
 
     # Labels
-    ax.set_xlabel('N Steps')
-    ax.set_ylabel('N Ingredients')
-    ax.set_zlabel('Len Steps')
-    ax.set_title('3D Scatter Plot avec Minutes comme Intensité')
+    ax.set_xlabel("N Steps")
+    ax.set_ylabel("N Ingredients")
+    ax.set_zlabel("Len Steps")
+    ax.set_title("3D Scatter Plot avec Minutes comme Intensité")
 
     # Ajouter une barre de couleur
     cbar = fig.colorbar(scatter, ax=ax, shrink=0.5)
-    cbar.set_label('Minutes')
+    cbar.set_label("Minutes")
 
     # Afficher la figure avec Streamlit
     st.pyplot(fig)
