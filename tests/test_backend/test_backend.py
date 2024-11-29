@@ -98,7 +98,7 @@ def test_generate_cluster_recipe(session, data_type="One word"):
                         clustering_type=clustering_type,
                         n_components=2,
                         nb_cluster=2,
-                        data_type,
+                        data_type="One word"
                     )
                 )
 
