@@ -3,13 +3,10 @@ Frontend va fournir l'ensemble des méthodes permettant l'affichage.
 """
 
 import streamlit as st
-import numpy as np
-import pandas as pd
-from sklearn.decomposition import PCA
+from streamlit_navigation_bar import st_navbar
 import plotly.express as px
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 
 def generate_layout():
@@ -27,19 +24,93 @@ def generate_layout():
         page_icon="src/frontend/images/favicon.png",  # Chemin relatif vers l'icône
         layout="wide",
     )
+
+    # Appliquer une feuille de style via HTML/CSS
+    st.markdown("""
+    <style>
+    /* Styles globaux */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #FFF4E1; /* Fond légèrement orangé */
+        color: #4A2C2A; /* Couleur de texte foncée pour un bon contraste */
+    }
+
+    /* Titres */
+    h1 {
+        color: #E65100; /* Orange vif */
+        font-size: 2.5em;
+        margin-bottom: 0.5em;
+        border-bottom: 2px solid #FFB74D; /* Ligne orange clair */
+        padding-bottom: 0.2em;
+    }
+
+    h2 {
+        color: #F57C00; /* Orange légèrement plus clair */
+        font-size: 2em;
+        margin-bottom: 0.1em;
+    }
+
+    h3 {
+        color: #FB8C00; /* Ton orangé intermédiaire */
+        font-size: 1.5em;
+        margin-bottom: 0.3em;
+    }
+
+    /* Texte de paragraphe */
+    p {
+        font-size: 1.1em;
+        line-height: 1.6;
+        margin: 1em 0;
+    }
+    ul {
+    margin: 0;
+    padding-left: 1.5em;
+    list-style-type: circle;
+    }
+    ol {
+        margin: 0;
+        padding-left: 1.5em;
+        list-style-type: decimal;
+    }
+    li {
+        margin-bottom: 5px;
+        margin: 0;
+    }
+    .main > div {
+        padding-top: 0; /* Supprime l'espace entre l'image et le menu */
+    }
+    """, unsafe_allow_html=True)
+
     # Titre principal de l'application
     st.image("src/frontend/images/mangetamain.jpg")
 
-    menu = st.selectbox(
-        "",
-        [
-            "Généralité",
-            "Clusterisation",
-            "Ingrédients qui vont bien ensemble",
-            "Corrélation rating ingrédient",
-            "Corrélation minutes",
-        ],
-    )
+    stylesmenu = {
+        "nav": {
+            "background-color": "darkorange",
+            "justify-content": "left",
+        },
+        "img": {
+            "padding-right": "14px",
+        },
+        "span": {
+            "color": "white",
+            "padding": "14px",
+        },
+        "active": {
+            "background-color": "white",
+            "color": "darkorange",
+            "font-weight": "normal",
+            "padding": "14px",
+        },
+        "hover": {
+            "background-color": "white",
+            "color": "darkorange",
+        }
+    }
+    menu = st_navbar(
+        ["Généralité", "Clusterisation", "Ingrédients qui vont bien ensemble", "Corrélation rating ingrédient", "Corrélation minutes"], styles=stylesmenu, adjust=False)
 
     # Zone principale de contenu
     st.header(menu)
