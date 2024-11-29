@@ -1,7 +1,7 @@
 """
-Module for managing the cooking database models and sessions.
+Module de gestion des modèles de base de données de cuisine et des sessions.
 
-This module defines the database models and provides functions to interact with the database.
+Ce module définit les modèles de base de données et fournit des fonctions pour interagir avec la base de données.
 """
 
 from sqlalchemy import (
@@ -26,8 +26,10 @@ def load_environment():
     """
     Charge les variables d'environnement à partir d'un fichier .env.
 
-    Retourne:
-        dict: Un dictionnaire contenant les variables d'environnement pour la base de données.
+    Retourne
+    --------
+    dict
+        Un dictionnaire contenant les variables d'environnement pour la base de données.
     """
     load_dotenv()
     return {
@@ -42,11 +44,15 @@ def create_db_engine(env):
     """
     Crée et retourne un moteur de base de données SQLAlchemy.
 
-    Paramètres:
-        env (dict): Un dictionnaire contenant les informations de connexion à la base de données.
+    Paramètres
+    ----------
+    env : dict
+        Un dictionnaire contenant les informations de connexion à la base de données.
 
-    Retourne:
-        sqlalchemy.engine.Engine: Un moteur de base de données SQLAlchemy.
+    Retourne
+    --------
+    sqlalchemy.engine.Engine
+        Un moteur de base de données SQLAlchemy.
     """
     DATABASE_URL = f"postgresql://{env['DB_USER']}:{env['DB_PASS']}@{env['DB_HOST']}:5432/{env['DB_NAME']}"
     engine = create_engine(DATABASE_URL)
@@ -68,12 +74,12 @@ class ObjectCollection:
 
     def __init__(self, objects):
         """
-        Initialize the ObjectCollection.
+        Initialise la collection d'objets.
 
-        Parameters
+        Paramètres
         ----------
         objects : list
-            A list of objects to be converted to a DataFrame.
+            Une liste d'objets à convertir en DataFrame.
         """
         self.objects = objects
 
@@ -81,10 +87,10 @@ class ObjectCollection:
         """
         Convertit la collection d'objets en DataFrame.
 
-        Returns
-        -------
+        Retourne
+        --------
         pd.DataFrame
-            A DataFrame containing the data from the objects.
+            Un DataFrame contenant les données des objets.
         """
         data = [obj.as_dict() for obj in self.objects]
         return pd.DataFrame(data)
@@ -93,10 +99,10 @@ class ObjectCollection:
         """
         Permet l'itération sur la collection d'objets.
 
-        Returns
-        -------
+        Retourne
+        --------
         iterator
-            An iterator over the objects in the collection.
+            Un itérateur sur les objets de la collection.
         """
         return iter(self.objects)
 
@@ -104,10 +110,10 @@ class ObjectCollection:
         """
         Permet d'utiliser len() pour obtenir le nombre d'objets dans la collection.
 
-        Returns
-        -------
+        Retourne
+        --------
         int
-            The number of objects in the collection.
+            Le nombre d'objets dans la collection.
         """
         return len(self.objects)
 
@@ -126,17 +132,17 @@ class BaseModel:
 
         Retourne une ObjectCollection.
 
-        Parameters
+        Paramètres
         ----------
         session : Session
-            The database session used to query the model.
+            La session de base de données utilisée pour interroger le modèle.
         filters : dict
-            Optional filters to apply to the query.
+            Des filtres optionnels à appliquer à la requête.
 
-        Returns
-        -------
+        Retourne
+        --------
         ObjectCollection
-            A collection of objects that match the query.
+            Une collection d'objets correspondant à la requête.
         """
         query = session.query(cls)
 
@@ -153,10 +159,10 @@ class BaseModel:
         """
         Convertit l'instance actuelle de l'objet en un DataFrame à une seule ligne.
 
-        Returns
-        -------
+        Retourne
+        --------
         pd.DataFrame
-            A DataFrame containing the data from the object.
+            Un DataFrame contenant les données de l'objet.
         """
         return pd.DataFrame([self.as_dict()])
 
@@ -164,10 +170,10 @@ class BaseModel:
         """
         Retourne les attributs de l'objet sous forme de dictionnaire.
 
-        Returns
-        -------
+        Retourne
+        --------
         dict
-            A dictionary containing the object's attributes.
+            Un dictionnaire contenant les attributs de l'objet.
         """
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
@@ -216,7 +222,19 @@ class Contributor(Base, BaseModel):
 
     def __init__(self, session=None, id=None, **kwargs):
         """
-        Charge avec les attributs de la table Contributor et les recettes associées (objet recipe).
+        Initialise l'instance avec les attributs de la table Contributor et les recettes associées (objet recipe).
+
+        Paramètres
+        ----------
+        session : Session, optionnel
+            La session de base de données utilisée pour interroger le modèle Contributor.
+        id : int, optionnel
+            L'identifiant du contributeur à charger.
+        **kwargs : dict
+            D'autres attributs à définir pour l'instance.
+
+        Si `id` et `session` sont fournis, l'instance est chargée avec les attributs du contributeur et ses recettes associées.
+        Sinon, les attributs sont définis à partir des arguments `kwargs`.
         """
         if id and session:
             contributor = (
@@ -281,16 +299,16 @@ class Recipe(Base, BaseModel):
 
     def __init__(self, session=None, id=None, **kwargs):
         """
-        Initialize a new instance of Recipe.
+        Initialise une nouvelle instance de Recipe.
 
-        Parameters
+        Paramètres
         ----------
-        session : Session, optional
-            The database session used to query the recipe.
-        id : int, optional
-            The ID of the recipe.
+        session : Session, optionnel
+            La session de base de données utilisée pour interroger la recette.
+        id : int, optionnel
+            L'identifiant de la recette.
         kwargs : dict
-            Additional attributes to set on the recipe.
+            D'autres attributs à définir pour la recette.
         """
         if id and session:
             recipe = (
@@ -346,16 +364,16 @@ class Ingredient(Base, BaseModel):
 
     def __init__(self, session=None, id=None, **kwargs):
         """
-        Initialize a new instance of Ingredient.
+        Initialise une nouvelle instance de Ingredient.
 
-        Parameters
+        Paramètres
         ----------
-        session : Session, optional
-            The database session used to query the ingredient.
-        id : int, optional
-            The ID of the ingredient.
+        session : Session, optionnel
+            La session de base de données utilisée pour interroger l'ingrédient.
+        id : int, optionnel
+            L'identifiant de l'ingrédient.
         kwargs : dict
-            Additional attributes to set on the ingredient.
+            D'autres attributs à définir pour l'ingrédient.
         """
         if id and session:
             ingredient = (
@@ -407,16 +425,16 @@ class Review(Base, BaseModel):
 
     def __init__(self, session=None, id=None, **kwargs):
         """
-        Initialize a new instance of Review.
+        Initialise une nouvelle instance de Review.
 
-        Parameters
+        Paramètres
         ----------
-        session : Session, optional
-            The database session used to query the review.
-        id : int, optional
-            The ID of the review.
+        session : Session, optionnel
+            La session de base de données utilisée pour interroger la critique.
+        id : int, optionnel
+            L'identifiant de la critique.
         kwargs : dict
-            Additional attributes to set on the review.
+            D'autres attributs à définir pour la critique.
         """
         if id and session:
             review = session.query(Review).filter_by(review_id=id).first()
@@ -460,16 +478,16 @@ class Reviewer(Base, BaseModel):
 
     def __init__(self, session=None, id=None, **kwargs):
         """
-        Initialize a new instance of Reviewer.
+        Initialise une nouvelle instance de Reviewer.
 
-        Parameters
+        Paramètres
         ----------
-        session : Session, optional
-            The database session used to query the reviewer.
-        id : int, optional
-            The ID of the reviewer.
+        session : Session, optionnel
+            La session de base de données utilisée pour interroger le critique.
+        id : int, optionnel
+            L'identifiant du critique.
         kwargs : dict
-            Additional attributes to set on the reviewer.
+            D'autres attributs à définir pour le critique.
         """
         if id and session:
             reviewer = (

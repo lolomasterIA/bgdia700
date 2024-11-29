@@ -21,11 +21,10 @@ def setup_logging():
     d'erreur. Les logs de debug sont enregistrés dans `logs/debug.log` et les logs
     d'erreur dans `logs/error.log`.
 
-    Returns
-    -------
+    Retourne
+    --------
     logging.Logger
         Le logger configuré.
-
     """
     if not os.path.exists("logs"):
         os.makedirs("logs")
