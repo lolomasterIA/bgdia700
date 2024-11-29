@@ -2,9 +2,7 @@
 
 from src.logging_config import setup_logging
 import streamlit as st
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from sqlalchemy.orm import sessionmaker, declarative_base
 import src.backend.datalayer.cooking as cook
 from dotenv import load_dotenv
@@ -13,7 +11,6 @@ from sqlalchemy import create_engine
 import src.backend.backend as backend
 import src.frontend.frontend as frontend
 import plotly.express as px
-import random
 
 
 def load_environment():
@@ -131,7 +128,6 @@ if __name__ == "__main__":
                 y=nombre_recettes,
                 labels={"x": "Nombre d'ingrédients",
                         "y": "Nombre de recettes"},
-                title="Nombre de recettes en fonction du nombre d'ingrédients",
             )
             fig.update_xaxes(dtick=2)
             st.plotly_chart(fig, use_container_width=True)
@@ -226,9 +222,14 @@ if __name__ == "__main__":
 
     elif menu == "Ingrédients qui vont bien ensemble":
         with col1:
-            if 'co_occurrence_matrix' not in locals():
+            if "co_occurrence_matrix" not in st.session_state:
                 co_occurrence_matrix, all_ingredients = backend.generate_matrice_ingredient(
                     session)
+                st.session_state.co_occurrence_matrix = co_occurrence_matrix
+                st.session_state.all_ingredients = all_ingredients
+            else:
+                co_occurrence_matrix = st.session_state.co_occurrence_matrix
+                all_ingredients = st.session_state.all_ingredients
             st.subheader("Suggestions d'Ingrédients")
             # Liste des ingrédients
             selected_ingredient = st.selectbox(

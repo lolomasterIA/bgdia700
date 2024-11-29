@@ -2896,6 +2896,20 @@ files = [
 catalogue = ">=2.0.3,<2.1.0"
 
 [[package]]
+name = "st-theme"
+version = "1.2.3"
+description = "A component that returns the active theme of the Streamlit app."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "st-theme-1.2.3.tar.gz", hash = "sha256:ca97aece1a48ded6e83fd742c27cb0851e1bce2100ab4b6c37c7b6e003b65b42"},
+    {file = "st_theme-1.2.3-py3-none-any.whl", hash = "sha256:0a54d9817dd5f8a6d7b0d071b25ae72eacf536c63a5fb97374923938021b1389"},
+]
+
+[package.dependencies]
+streamlit = ">=1.33"
+
+[[package]]
 name = "streamlit"
 version = "1.40.1"
 description = "A faster way to build and share data apps"
@@ -2929,6 +2943,21 @@ watchdog = {version = ">=2.1.5,<7", markers = "platform_system != \"Darwin\""}
 
 [package.extras]
 snowflake = ["snowflake-connector-python (>=2.8.0)", "snowflake-snowpark-python[modin] (>=1.17.0)"]
+
+[[package]]
+name = "streamlit-navigation-bar"
+version = "3.3.0"
+description = "A component that allows you to place a navigation bar in your Streamlit app."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "streamlit-navigation-bar-3.3.0.tar.gz", hash = "sha256:f458c3f9bbb72a3fa07a28c1db98eceabdd49b19f71fafb44dc36042e0d4b4c4"},
+    {file = "streamlit_navigation_bar-3.3.0-py3-none-any.whl", hash = "sha256:25be9657d7f44c0d4f2759a12bd75de7bb0829ed1dc69d9a5e91a77bc69924d8"},
+]
+
+[package.dependencies]
+st-theme = ">=1.2.3"
+streamlit = ">=1.33.0"
 
 [[package]]
 name = "tenacity"
@@ -3425,4 +3454,4 @@ scikit-learn = ["scikit-learn"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "6e6c7f683540eecf16f5cde27902936604c71d774d29ca43c0d5372030232253"
+content-hash = "4871c1c022c390c15c8a6b03c2906625219152925b7ad1ebf9a3ae84c1ff0a88"
