@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+from collections import namedtuple
 
 from src.backend.datalayer.cooking import (
     load_environment,
@@ -59,11 +60,100 @@ def test_create_db_engine(mock_env):
         assert Base is not None
 
 
+def test_object_collection(mock_session):
+    # Simuler les objets retournés par la requête
+    MockObject = namedtuple("MockObject", ["id", "name", "value"])
+    mock_objects = [
+        MockObject(id=1, name="Object1", value=10),
+        MockObject(id=2, name="Object2", value=20),
+        MockObject(id=3, name="Object3", value=30),
+    ]
+    mock_session.query().all.return_value = mock_objects
+
+    # Créer une collection d'objets
+    collection = ObjectCollection(mock_session.query().all())
+
+    # Vérifier la conversion en DataFrame
+    df = collection.to_dataframe()
+    assert len(df) == 3
+    assert list(df.columns) == ["id", "name", "value"]
+    assert df.iloc[0]["name"] == "Object1"
+
+    # Vérifier l'itération
+    for obj, expected in zip(collection, mock_objects):
+        assert obj == expected
+
+    # Vérifier la longueur
+    assert len(collection) == 3
+
+
+def test_get_all(mock_session):
+    # Simuler les objets retournés par la requête
+    MockObject = namedtuple("MockObject", ["id", "name", "value"])
+    mock_objects = [
+        MockObject(id=1, name="Object1", value=10),
+        MockObject(id=2, name="Object2", value=20),
+        MockObject(id=3, name="Object3", value=30),
+    ]
+
+    mock_query = MagicMock()
+    mock_query.all = MagicMock(return_value=mock_objects)
+    mock_session.query = MagicMock(return_value=mock_query)
+
+    # Appeler la méthode get_all
+    result = BaseModel.get_all(mock_session)
+    assert isinstance(result, ObjectCollection)
+
+    # Vérifier que tous les objets sont récupérés
+    objects = list(result)
+    assert len(objects) == 3
+    assert objects[0].name == "Object1"
+
+    # Vérifier que query() a bien été appelé
+    # Vérifie que query(BaseModel) a été appelé
+    mock_session.query.assert_called_once_with(BaseModel)
+    mock_query.all.assert_called_once()  # Vérifie que .all() a été invoqué
+
+
+def test_get_filtered_objects(mock_session):
+    # Ajouter un objet Recipe à la base
+    recipe = Recipe(recipe_id=3, name="Filtered Recipe")
+    mock_session.add(recipe)
+    mock_session.commit()
+
+    # Tester la méthode avec un filtre
+    result = mock_session.query(Recipe).filter_by(
+        name="Filtered Recipe").first()
+    assert result is not None
+    assert result.recipe_id == 3
+    assert result.name == "Filtered Recipe"
+
+
+def test_to_dataframe_single_object(mock_session):
+    # Ajouter un objet Recipe à la base
+    recipe = Recipe(recipe_id=1, name="Test Recipe")
+    mock_session.add(recipe)
+    mock_session.commit()
+
+    # Récupérer l'objet et tester to_dataframe
+    result = mock_session.query(Recipe).filter_by(recipe_id=1).first()
+    assert result is not None  # Vérifier que l'objet est récupéré
+
+    # Convertir en DataFrame
+    df = result.to_dataframe()
+
+    # Vérifier le contenu du DataFrame
+    assert len(df) == 1  # Une seule ligne
+    assert df.iloc[0]["recipe_id"] == 1
+    assert df.iloc[0]["name"] == "Test Recipe"
+
+
 def test_contributor_model(mock_session):
     contributor = Contributor(contributor_id=1)
     mock_session.add(contributor)
     mock_session.commit()
-    result = mock_session.query(Contributor).filter_by(contributor_id=1).first()
+    result = mock_session.query(Contributor).filter_by(
+        contributor_id=1).first()
     assert result.contributor_id == 1
 
 
