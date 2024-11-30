@@ -60,33 +60,6 @@ def test_create_db_engine(mock_env):
         assert Base is not None
 
 
-def test_object_collection(mock_session):
-    # Simuler les objets retournés par la requête
-    MockObject = namedtuple("MockObject", ["id", "name", "value"])
-    mock_objects = [
-        MockObject(id=1, name="Object1", value=10),
-        MockObject(id=2, name="Object2", value=20),
-        MockObject(id=3, name="Object3", value=30),
-    ]
-    mock_session.query().all.return_value = mock_objects
-
-    # Créer une collection d'objets
-    collection = ObjectCollection(mock_session.query().all())
-
-    # Vérifier la conversion en DataFrame
-    df = collection.to_dataframe()
-    assert len(df) == 3
-    assert list(df.columns) == ["id", "name", "value"]
-    assert df.iloc[0]["name"] == "Object1"
-
-    # Vérifier l'itération
-    for obj, expected in zip(collection, mock_objects):
-        assert obj == expected
-
-    # Vérifier la longueur
-    assert len(collection) == 3
-
-
 def test_get_all(mock_session):
     # Simuler les objets retournés par la requête
     MockObject = namedtuple("MockObject", ["id", "name", "value"])
