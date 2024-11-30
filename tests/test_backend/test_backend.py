@@ -56,7 +56,7 @@ def test_top_ingredient_used(session, mock_data, data_type="One word"):
     assert result[0][0] == "Ingredient 2"
 
 
-def test_top_ingredient_rating(session, mock_data, data_type="One word"):
+def test_top_ingredient_rating(session, mock_data):
     # Définir un namedtuple pour simuler les résultats de la requête SQLAlchemy
     IngredientRating = namedtuple(
         "IngredientRating", ["name", "review_count", "average_rating"]
@@ -76,7 +76,7 @@ def test_top_ingredient_rating(session, mock_data, data_type="One word"):
     assert review_count["Ingredient 2"] == 20
 
 
-def test_generate_cluster_recipe(session, data_type="One word"):
+def test_generate_cluster_recipe(session):
     # Mock des données pour simuler la base de données
     RecipeIngredients = namedtuple(
         "RecipeIngredients", ["name", "ingredients"])
