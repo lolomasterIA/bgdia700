@@ -26,7 +26,8 @@ def generate_layout():
     )
 
     # Appliquer une feuille de style via HTML/CSS
-    st.markdown("""
+    st.markdown(
+        """
     <style>
     /* Styles globaux */
     body {
@@ -81,7 +82,9 @@ def generate_layout():
     .main > div {
         padding-top: 0; /* Supprime l'espace entre l'image et le menu */
     }
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
 
     # Titre principal de l'application
     st.image("src/frontend/images/mangetamain.jpg")
@@ -107,11 +110,20 @@ def generate_layout():
         "hover": {
             "background-color": "white",
             "color": "darkorange",
-        }
+        },
     }
 
     menu = st_navbar(
-        ["Généralité", "Clusterisation", "Ingrédients qui vont bien ensemble", "Corrélation rating ingrédient", "Corrélation minutes"], styles=stylesmenu, adjust=False)
+        [
+            "Généralité",
+            "Clusterisation",
+            "Ingrédients qui vont bien ensemble",
+            "Corrélation rating ingrédient",
+            "Corrélation minutes",
+        ],
+        styles=stylesmenu,
+        adjust=False,
+    )
 
     # Zone principale de contenu
     st.header(menu)

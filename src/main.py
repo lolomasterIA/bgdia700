@@ -155,8 +155,7 @@ if __name__ == "__main__":
             fig = px.bar(
                 x=nombre_ingredients,
                 y=nombre_recettes,
-                labels={"x": "Nombre d'ingrédients",
-                        "y": "Nombre de recettes"},
+                labels={"x": "Nombre d'ingrédients", "y": "Nombre de recettes"},
             )
             fig.update_xaxes(dtick=2)
             st.plotly_chart(fig, use_container_width=True)
