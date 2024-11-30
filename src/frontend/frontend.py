@@ -112,6 +112,7 @@ def generate_layout():
             "color": "darkorange",
         },
     }
+
     menu = st_navbar(
         [
             "Généralité",
@@ -309,3 +310,32 @@ def display_minutes_byfeature(df_results):
 
     # Afficher la figure avec Streamlit
     st.pyplot(fig)
+
+
+def display_sidebar(nb_ingredient, selected_data):
+    """
+    Affiche les informations dans la barre latérale de Streamlit.
+
+    Parameters
+    ----------
+    nb_ingredient : int
+        Nombre total d'ingrédients.
+    selected_data : str
+        Type de données sélectionné pour les ingrédients : 
+        "One word" pour les ingrédients à un mot, ou un autre type pour inclure tous les ingrédients.
+
+    Returns
+    -------
+    None
+        Cette fonction n'a pas de retour explicite. Elle affiche du contenu dans l'interface Streamlit.
+    """
+    st.write(f"Nombre d'ingrédients : {nb_ingredient}")
+    st.write("Ingrédients utilisés dans les analyses :")
+
+    if selected_data == "One word":
+        st.write(
+            "Récupération des ingrédients à un mot. "
+            "Réduction des autres ingrédients à un mot parmi ceux sélectionnés précédemment."
+        )
+    else:
+        st.write("Tous les ingrédients du dataset initial.")

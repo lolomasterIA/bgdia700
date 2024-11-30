@@ -1,9 +1,10 @@
 """
-Module for altering the database schema and updating ingredient name with lem_name.
+Module for altering the database schema and updating ingredient name with name with only one word in.
 """
 
 from sqlalchemy import create_engine, text, update
 from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import func
 import os
 from dotenv import load_dotenv
@@ -87,6 +88,7 @@ def all_ingredient(session):
     return query.all()
 
 
+# récupérer tous les ingrédients et tous les ingrédients à un mot.
 onewordingr = set(oneword_ingredient(session))
 allwordsingr = all_ingredient(session)
 newwords = {}
@@ -94,15 +96,30 @@ for name, id in allwordsingr:
     for word in name.split():
         if word in onewordingr:
             newwords[id] = word
-print(newwords)
-print(len(newwords))
-# # Traiter les résultats
-# lem_results = [
-#     {"ingredient_id": ingredient_id, "lem_name": lemmatize_name(name)}
-#     for name, ingredient_id in results
-# ]
-# # Extraire les lem_name uniques
-# unique_lem_names = {result["lem_name"] for result in lem_results}
+print("youhou")
 
-# # Afficher le nombre de lem_name uniques
-# print(f"Nombre de lem_name uniques : {len(unique_lem_names)}")
+# Ajouter une colonne à la table si elle n'existe pas déjà
+with engine.begin() as connection:
+    connection.execute(
+        text(
+            "ALTER TABLE ingredient ADD COLUMN IF NOT EXISTS name_one_word VARCHAR;"
+        )
+    )
+
+# Mettre à jour les valeurs de la colonne name_one_word
+for id, one_word in newwords.items():
+    session.execute(
+        text("""
+        UPDATE ingredient
+        SET name_one_word = :one_word
+        WHERE ingredient_id = :id
+        """),
+        {"one_word": lemmatize_name(one_word), "id": id}
+    )
+
+print("ok")
+# Valider les changements
+session.commit()
+
+# Fermer la session
+session.close()
