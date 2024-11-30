@@ -23,6 +23,7 @@ Base = declarative_base()
 Session = sessionmaker(bind=engine)
 session = Session()
 
+# récupère les ingrédient avec les ratings sommés et le nombre de reviews (associé recettes)
 query = (
     session.query(
         cook.recipe_ingredient.c.ingredient_id,
@@ -37,7 +38,6 @@ query = (
     .group_by(cook.recipe_ingredient.c.ingredient_id)
 )
 
-# Exécuter et afficher les résultats
 results = query.all()
 
 

@@ -63,6 +63,29 @@ if __name__ == "__main__":
 
     menu, col1, col2, col3, col4, col5, col6 = frontend.generate_layout()
 
+    # Conserver l'état précédent de ingredient_data_type
+    # Pour recharcher le dataset de la matrice de co occurrences si changment de data ingrédients
+    if "prev_ingredient_data_type" not in st.session_state:
+        st.session_state["prev_ingredient_data_type"] = None
+
+    # Sélection de l'utilisateur
+    with st.sidebar:
+        ingredient_data_type = st.selectbox(
+            "Type de nom d'ingrédient :", options=["full", "One word"], placeholder="One word"
+        )
+        nb_ingredient = backend.nb_ingredient(session, ingredient_data_type)
+        frontend.display_sidebar(nb_ingredient, ingredient_data_type)
+
+    # Si la valeur change, supprimer co_occurrence_matrix et mettre à jour l'état précédent
+    if ingredient_data_type != st.session_state["prev_ingredient_data_type"]:
+        if "co_occurrence_matrix" in st.session_state:
+            del st.session_state["co_occurrence_matrix"]
+            st.write("co_occurrence_matrix a été supprimée.")
+
+    # Mettre à jour la valeur précédente
+    st.session_state["prev_ingredient_data_type"] = ingredient_data_type
+
+    # Affichage du coeur de la page
     if menu == "Généralité":
         # Affichage des statistiques générales sur les recettes et ingrédients
 
@@ -76,15 +99,17 @@ if __name__ == "__main__":
         total_recettes = sum(nombre_recettes)
 
         # Top 10 des ingrédients les plus utilisés dans les recettes
-        top_ingredient_used = backend.top_ingredient_used(session, 10)
+        top_ingredient_used = backend.top_ingredient_used(
+            session, 10, ingredient_data_type)
         df_top_ingredient_used = pd.DataFrame(top_ingredient_used)
         df_top_ingredient_used = df_top_ingredient_used.rename(
-            columns={"name": "Ingrédient", "recipe_count": "Nombre de recettes"}
+            columns={"name": "Ingrédient",
+                     "recipe_count": "Nombre de recettes"}
         )
 
         # Notes moyennes et nombre de reviews pour chaque ingrédient
         ingredient_total_rating, ingredient_review_count = (
-            backend.top_ingredient_rating(session)
+            backend.top_ingredient_rating(session, ingredient_data_type)
         )
 
         df_ingredient_review_count = pd.DataFrame(
@@ -111,19 +136,21 @@ if __name__ == "__main__":
         with col1:
             # Affichage du top 10 des ingrédients les plus utilisés
             styled_top_10 = (
-                df_top_ingredient_used.style.highlight_max(axis=0, color="lightgreen")
+                df_top_ingredient_used.style.highlight_max(
+                    axis=0, color="lightgreen")
                 .highlight_min(axis=0, color="lightcoral")
                 .format({"Nombre": "{:.1f}%"})
             )
             st.subheader(
-                "Top 10 des ingrédients (total : " + str(total_ingredient) + ")"
+                "Top 10 des ingrédients"
             )
             st.dataframe(styled_top_10, use_container_width=True)
 
         with col2:
             # Création d'un graphique en barres pour visualiser le nombre de recettes en fonction du nombre d'ingrédients
             st.subheader(
-                "Nb recettes (total : " + str(total_recettes) + ") / nb ingrédients"
+                "Nb recettes (total : " + str(total_recettes) +
+                ") / nb ingrédients"
             )
             fig = px.bar(
                 x=nombre_ingredients,
@@ -210,12 +237,13 @@ if __name__ == "__main__":
 
             df, nombre_total_recettes, nombre_total_ingredients = (
                 backend.generate_cluster_recipe(
-                    session, matrix_type, reduction_type, clustering_type, 2, nb_cluster
+                    session, matrix_type, reduction_type, clustering_type, 2, nb_cluster, ingredient_data_type
                 )
             )
 
             st.text(
-                "Nombre d'ingrédients après filtres : " + str(nombre_total_ingredients)
+                "Nombre d'ingrédients après filtres : " +
+                str(nombre_total_ingredients)
             )
         with col2:
             frontend.display_cluster_recipe(df)
@@ -224,9 +252,8 @@ if __name__ == "__main__":
         with col1:
             # stokage en session de la grosse matrice pour ne pas la recalculer
             if "co_occurrence_matrix" not in st.session_state:
-                co_occurrence_matrix, all_ingredients = (
-                    backend.generate_matrice_ingredient(session)
-                )
+                co_occurrence_matrix, all_ingredients = backend.generate_matrice_ingredient(
+                    session, ingredient_data_type)
                 st.session_state.co_occurrence_matrix = co_occurrence_matrix
                 st.session_state.all_ingredients = all_ingredients
             else:
@@ -239,17 +266,18 @@ if __name__ == "__main__":
             selected_ingredient = st.selectbox(
                 "Sélectionnez un ingrédient pour obtenir des suggestions :",
                 options=all_ingredients,
-                placeholder="cheese",
+                placeholder="cheese"
             )
             if selected_ingredient:
                 suggestions = backend.suggestingredients(
                     co_occurrence_matrix, selected_ingredient, top_n=5
                 )
                 if suggestions:
-                    st.write(f"Ingrédients qui vont bien avec '{selected_ingredient}':")
+                    st.write(
+                        f"Ingrédients qui vont bien avec '{selected_ingredient}':")
                     for ingredient, co_occurrence in suggestions:
                         st.write(
-                            f"- {ingredient} : Note {backend.get_ingredient_rating(session, ingredient)} | {co_occurrence} occurrences"
+                            f"- {ingredient} : Note {backend.get_ingredient_rating(session, ingredient, ingredient_data_type)} | {co_occurrence} occurrences"
                         )
                 else:
                     st.write("Aucune suggestion disponible.")
