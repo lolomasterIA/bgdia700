@@ -63,17 +63,23 @@ def test_top_ingredient_rating(session, mock_data):
     )
 
     # Mock la requête SQLAlchemy
-    session.query().join().join().join().group_by().all.return_value = [
+    # Mock des jointures et de la requête SQLAlchemy
+    mock_query = MagicMock()
+    session.query.return_value = mock_query
+    mock_query.join.return_value = mock_query  # Simule les appels chaînés à join()
+    mock_query.group_by.return_value = mock_query  # Simule group_by()
+    mock_query.where.return_value = mock_query  # Simule where()
+    mock_query.all.return_value = [
         IngredientRating("Ingredient 1", 10, 4.5),
         IngredientRating("Ingredient 2", 20, 3.0),
         IngredientRating("Ingredient 3", 5, 5.0),
     ]
     avg_rating, review_count = backend.top_ingredient_rating(
-        session, data_type)
+        session)
     assert isinstance(avg_rating, dict)
     assert isinstance(review_count, dict)
-    assert avg_rating["Ingredient 3"] == 5.0
     assert review_count["Ingredient 2"] == 20
+    assert avg_rating["Ingredient 3"] == 5.0
 
 
 def test_generate_cluster_recipe(session):
@@ -216,10 +222,21 @@ def test_suggestingredients(session, mock_data):
 
 def test_get_ingredient_rating(session, data_type="One word"):
     # Mock la requête SQLAlchemy
-    session.query().filter().first.return_value = namedtuple(
-        "Rating", ["rating"])(4.5)
+    ingredient_name = "Tomato"
+    expected_rating = 4.5
 
-    result = backend.get_ingredient_rating(session, "Ingredient 1", data_type)
+    # Définir un namedtuple pour simuler le résultat de .first()
+    Rating = namedtuple("Rating", ["rating"])
+
+    # Mock de la requête SQLAlchemy
+    mock_query = MagicMock()
+    session.query.return_value = mock_query
+    mock_query.filter.return_value = mock_query  # Simule le chaînage
+    mock_query.where.return_value = mock_query   # Simule le chaînage
+    mock_query.first.return_value = Rating(
+        rating=expected_rating)  # Simule le résultat
+
+    result = backend.get_ingredient_rating(session, ingredient_name, data_type)
     assert isinstance(result, float)
     assert result == 4.5
 
