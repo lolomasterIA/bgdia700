@@ -50,12 +50,39 @@ def lemmatize_name(name):
 
 
 def oneword_ingredient(session):
+    """
+    Récupère les noms d'ingrédients composés d'un seul mot.
+
+    Paramètres
+    ----------
+    session : Session
+        La session SQLAlchemy pour interroger la base de données.
+
+    Retourne
+    -------
+    list
+        Une liste de noms d'ingrédients composés d'un seul mot.
+    """
     query = session.query(cook.Ingredient.name).filter(
-        cook.Ingredient.name.op('~')('^[^ ]+$'))
+        cook.Ingredient.name.op("~")("^[^ ]+$")
+    )
     return [name for (name,) in query.all()]
 
 
 def all_ingredient(session):
+    """
+    Récupère tous les ingrédients avec leurs identifiants.
+
+    Paramètres
+    ----------
+    session : Session
+        La session SQLAlchemy pour interroger la base de données.
+
+    Retourne
+    -------
+    list
+        Une liste de tuples contenant les noms d'ingrédients et leurs identifiants.
+    """
     query = session.query(cook.Ingredient.name, cook.Ingredient.ingredient_id)
     return query.all()
 

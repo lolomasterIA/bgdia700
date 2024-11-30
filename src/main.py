@@ -128,8 +128,7 @@ if __name__ == "__main__":
             fig = px.bar(
                 x=nombre_ingredients,
                 y=nombre_recettes,
-                labels={"x": "Nombre d'ingrédients",
-                        "y": "Nombre de recettes"},
+                labels={"x": "Nombre d'ingrédients", "y": "Nombre de recettes"},
             )
             fig.update_xaxes(dtick=2)
             st.plotly_chart(fig, use_container_width=True)
@@ -225,8 +224,9 @@ if __name__ == "__main__":
         with col1:
             # stokage en session de la grosse matrice pour ne pas la recalculer
             if "co_occurrence_matrix" not in st.session_state:
-                co_occurrence_matrix, all_ingredients = backend.generate_matrice_ingredient(
-                    session)
+                co_occurrence_matrix, all_ingredients = (
+                    backend.generate_matrice_ingredient(session)
+                )
                 st.session_state.co_occurrence_matrix = co_occurrence_matrix
                 st.session_state.all_ingredients = all_ingredients
             else:
@@ -234,7 +234,7 @@ if __name__ == "__main__":
                 all_ingredients = st.session_state.all_ingredients
 
             st.subheader("Suggestions d'Ingrédients")
-            
+
             # Liste des ingrédients
             selected_ingredient = st.selectbox(
                 "Sélectionnez un ingrédient pour obtenir des suggestions :",
