@@ -191,3 +191,17 @@ def test_reviewer_model(mock_session):
     mock_session.commit()
     result = mock_session.query(Reviewer).filter_by(reviewer_id=1).first()
     assert result.reviewer_id == 1
+
+
+def test_object_collection():
+    objects = [
+        MagicMock(as_dict=lambda: {"id": 1}),
+        MagicMock(as_dict=lambda: {"id": 2}),
+    ]
+    collection = ObjectCollection(objects)
+    df = collection.to_dataframe()
+    assert len(df) == 2
+    assert df.iloc[0]["id"] == 1
+    assert df.iloc[1]["id"] == 2
+    assert len(collection) == 2
+    assert list(iter(collection)) == objects
