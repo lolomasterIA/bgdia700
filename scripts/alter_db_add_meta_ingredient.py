@@ -104,7 +104,7 @@ with engine.begin() as connection:
         text("ALTER TABLE ingredient ADD COLUMN IF NOT EXISTS name_one_word VARCHAR;")
     )
 
-# Mettre à jour les valeurs de la colonne name_one_word
+# Mettre à jour les valeurs de la colonne name_one_word (plus lemmatize)
 for id, one_word in newwords.items():
     session.execute(
         text(

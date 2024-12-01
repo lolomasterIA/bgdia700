@@ -120,6 +120,25 @@ def test_to_dataframe_single_object(mock_session):
     assert df.iloc[0]["name"] == "Test Recipe"
 
 
+def test_as_dict(mock_session):
+    # Ajouter un objet Recipe à la base
+    recipe = Recipe(recipe_id=1, name="Test Recipe")
+    mock_session.add(recipe)
+    mock_session.commit()
+
+    # Récupérer l'objet et tester as_dict
+    result = mock_session.query(Recipe).filter_by(recipe_id=1).first()
+    assert result is not None  # Vérifier que l'objet est récupéré
+
+    # Convertir en dictionnaire
+    obj_dict = result.as_dict()
+
+    # Vérifier le contenu du dictionnaire
+    assert isinstance(obj_dict, dict)
+    assert obj_dict["recipe_id"] == 1
+    assert obj_dict["name"] == "Test Recipe"
+
+
 def test_contributor_model(mock_session):
     contributor = Contributor(contributor_id=1)
     mock_session.add(contributor)
