@@ -106,7 +106,7 @@ with engine.begin() as connection:
         )
     )
 
-# Mettre à jour les valeurs de la colonne name_one_word
+# Mettre à jour les valeurs de la colonne name_one_word (plus lemmatize)
 for id, one_word in newwords.items():
     session.execute(
         text("""
