@@ -64,8 +64,7 @@ def top_ingredient_used(session, n, data_type="One word"):
     results = (
         session.query(
             name.label("name"),
-            func.count(cook.recipe_ingredient.c.recipe_id).label(
-                "recipe_count"),
+            func.count(cook.recipe_ingredient.c.recipe_id).label("recipe_count"),
         )
         .join(
             cook.recipe_ingredient,
@@ -76,8 +75,7 @@ def top_ingredient_used(session, n, data_type="One word"):
     )
 
     # Trier les résultats par nombre de recettes en ordre décroissant
-    nbingredientsrecettes_trie = sorted(
-        results, key=lambda x: x[1], reverse=True)
+    nbingredientsrecettes_trie = sorted(results, key=lambda x: x[1], reverse=True)
 
     # Récupérer les n premiers ingrédients
     return nbingredientsrecettes_trie[:n]
@@ -121,10 +119,7 @@ def top_ingredient_rating(session, data_type="One word"):
             cook.recipe_ingredient.c.ingredient_id == cook.Ingredient.ingredient_id,
         )
         .group_by(name)
-        .where(
-            (name.isnot(None))
-            & (name != '')
-        )
+        .where((name.isnot(None)) & (name != ""))
         .all()
     )
     ingredient_average_rating = {
@@ -149,7 +144,7 @@ def generate_cluster_recipe(
     clustering_type="kmeans",
     n_components=2,
     nb_cluster=2,
-    data_type="One word"
+    data_type="One word",
 ):
     """
     Effectue une clusterisation des ingrédients en fonction de leur utilisation dans les recettes.
@@ -208,7 +203,7 @@ def generate_cluster_recipe(
             & (cook.Recipe.n_ingredients > 3)
             & (cook.Ingredient.nb_recette > 5)
             & (name.isnot(None))
-            & (name != '')
+            & (name != "")
         )
         .all()
     )
@@ -224,8 +219,7 @@ def generate_cluster_recipe(
     # Nombre total de recettes
     nombre_total_recettes = df_recipes_ingredients["id_recipe"].nunique()
     # Nombre total d'ingrédients (en considérant les ingrédients uniques dans toutes les recettes)
-    nombre_total_ingredients = df_recipes_ingredients["ingredients"].explode(
-    ).nunique()
+    nombre_total_ingredients = df_recipes_ingredients["ingredients"].explode().nunique()
 
     # Avec CountVectorizer et tfidf
     if matrix_type == "tfidf":
@@ -323,7 +317,7 @@ def generate_kmeans_ingredient(session, nb_cluster, data_type="One word"):
             & (cook.Recipe.n_ingredients > 3)
             & (cook.Ingredient.nb_recette > 5)
             & (name.isnot(None))
-            & (name != '')
+            & (name != "")
         )
         .all()
     )
@@ -354,15 +348,12 @@ def generate_kmeans_ingredient(session, nb_cluster, data_type="One word"):
     for ingredients_list in df_recipes_ingredients["ingredients"]:
         for i in range(len(ingredients_list)):
             for j in range(i + 1, len(ingredients_list)):
-                co_occurrence_matrix.loc[ingredients_list[i],
-                                         ingredients_list[j]] += 1
-                co_occurrence_matrix.loc[ingredients_list[j],
-                                         ingredients_list[i]] += 1
+                co_occurrence_matrix.loc[ingredients_list[i], ingredients_list[j]] += 1
+                co_occurrence_matrix.loc[ingredients_list[j], ingredients_list[i]] += 1
 
     # Clustering avec KMeans basé sur la similarité cosinus
     similarity_matrix = cosine_similarity(co_occurrence_matrix)
-    kmeans = KMeans(n_clusters=nb_cluster,
-                    random_state=0).fit(similarity_matrix)
+    kmeans = KMeans(n_clusters=nb_cluster, random_state=0).fit(similarity_matrix)
 
     # Visualisation des clusters après réduction de dimension
     pca = PCA(n_components=2)
@@ -414,7 +405,7 @@ def generate_matrice_ingredient(session, data_type="One word"):
             & (cook.Recipe.n_ingredients > 3)
             & (cook.Ingredient.nb_recette > 5)
             & (name.isnot(None))
-            & (name != '')
+            & (name != "")
         )
         .all()
     )
@@ -445,10 +436,8 @@ def generate_matrice_ingredient(session, data_type="One word"):
     for ingredients_list in df_recipes_ingredients["ingredients"]:
         for i in range(len(ingredients_list)):
             for j in range(i + 1, len(ingredients_list)):
-                co_occurrence_matrix.loc[ingredients_list[i],
-                                         ingredients_list[j]] += 1
-                co_occurrence_matrix.loc[ingredients_list[j],
-                                         ingredients_list[i]] += 1
+                co_occurrence_matrix.loc[ingredients_list[i], ingredients_list[j]] += 1
+                co_occurrence_matrix.loc[ingredients_list[j], ingredients_list[i]] += 1
     return co_occurrence_matrix, all_ingredients
 
 
@@ -506,10 +495,7 @@ def get_ingredient_rating(session, ingredient_name, data_type="One word"):
             ).label("rating")
         )
         .filter(name == ingredient_name)
-        .where(
-            (name.isnot(None))
-            & (name != '')
-        )
+        .where((name.isnot(None)) & (name != ""))
         .first()
     )
 
@@ -560,8 +546,7 @@ def generate_regression_ingredient(session, model="rl"):
             cook.Recipe.n_ingredients,
             func.char_length(cook.Recipe.steps).label("len_steps"),
             func.char_length(cook.Recipe.description).label("len_description"),
-            (cook.Ingredient.sum_rating /
-             cook.Ingredient.count_review).label("rating"),
+            (cook.Ingredient.sum_rating / cook.Ingredient.count_review).label("rating"),
         )
         .join(
             cook.recipe_ingredient,
@@ -595,8 +580,7 @@ def generate_regression_ingredient(session, model="rl"):
             "rating",
         ],
     )
-    features = ["minutes", "n_steps", "n_ingredients",
-                "len_steps", "len_description"]
+    features = ["minutes", "n_steps", "n_ingredients", "len_steps", "len_description"]
     target = "rating"
 
     # Préparation des données
@@ -624,8 +608,7 @@ def generate_regression_ingredient(session, model="rl"):
         r2 = r2_score(y_test, y_pred)
 
         # Affichage des coefficients
-        coefficients = pd.DataFrame(
-            {"Feature": features, "Coefficient": model.coef_})
+        coefficients = pd.DataFrame({"Feature": features, "Coefficient": model.coef_})
 
     # modèle Gradient Boosting
     if model == "xgb":
@@ -731,8 +714,7 @@ def generate_regression_minutes(session, model="rl", selected_method="DeleteQ1Q3
         y_pred = model.predict(X_test)
         mse = mean_squared_error(y_test, y_pred)
         r2 = r2_score(y_test, y_pred)
-        coefficients = pd.DataFrame(
-            {"Feature": features, "Coefficient": model.coef_})
+        coefficients = pd.DataFrame({"Feature": features, "Coefficient": model.coef_})
     elif model == "xgb":
         # Modèle de gradient boosting
         model = XGBRegressor(random_state=42)
@@ -748,8 +730,7 @@ def generate_regression_minutes(session, model="rl", selected_method="DeleteQ1Q3
         mse = mean_squared_error(y_test, y_pred)
         r2 = r2_score(y_test, y_pred)
     else:
-        raise ValueError(
-            "Modèle non reconnu : choisissez 'rl', 'xgb' ou 'rf'.")
+        raise ValueError("Modèle non reconnu : choisissez 'rl', 'xgb' ou 'rf'.")
 
     # Ajout des prédictions au DataFrame
     df_results["predicted_minutes"] = model.predict(X)
@@ -800,8 +781,7 @@ def delete_outliers(df, key, method, **kwargs):
         df["is_outlier"] = outliers == -1
         df = df[~df["is_outlier"]].drop(columns=["is_outlier"])
     elif method == "DBScan":
-        db = DBSCAN(eps=kwargs.get("eps", 3),
-                    min_samples=kwargs.get("min_samples", 5))
+        db = DBSCAN(eps=kwargs.get("eps", 3), min_samples=kwargs.get("min_samples", 5))
         labels = db.fit_predict(df[["minutes", "n_steps"]])
         df["is_outlier"] = labels == -1
         df = df[~df["is_outlier"]].drop(columns=["is_outlier"])
@@ -844,13 +824,8 @@ def nb_ingredient(session, ingredient_data_type):
 
     # Requête SQLAlchemy pour compter les noms distincts
     distinct_count = (
-        session.query(
-            func.count(distinct(name))
-        )
-        .where(
-            (name.isnot(None))
-            & (name != "")
-        )
+        session.query(func.count(distinct(name)))
+        .where((name.isnot(None)) & (name != ""))
         .scalar()
     )
     return distinct_count
