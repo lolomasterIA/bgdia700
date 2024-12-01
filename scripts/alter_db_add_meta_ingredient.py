@@ -101,20 +101,20 @@ print("youhou")
 # Ajouter une colonne à la table si elle n'existe pas déjà
 with engine.begin() as connection:
     connection.execute(
-        text(
-            "ALTER TABLE ingredient ADD COLUMN IF NOT EXISTS name_one_word VARCHAR;"
-        )
+        text("ALTER TABLE ingredient ADD COLUMN IF NOT EXISTS name_one_word VARCHAR;")
     )
 
 # Mettre à jour les valeurs de la colonne name_one_word
 for id, one_word in newwords.items():
     session.execute(
-        text("""
+        text(
+            """
         UPDATE ingredient
         SET name_one_word = :one_word
         WHERE ingredient_id = :id
-        """),
-        {"one_word": lemmatize_name(one_word), "id": id}
+        """
+        ),
+        {"one_word": lemmatize_name(one_word), "id": id},
     )
 
 print("ok")

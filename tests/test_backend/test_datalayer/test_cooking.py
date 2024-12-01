@@ -95,8 +95,7 @@ def test_get_filtered_objects(mock_session):
     mock_session.commit()
 
     # Tester la méthode avec un filtre
-    result = mock_session.query(Recipe).filter_by(
-        name="Filtered Recipe").first()
+    result = mock_session.query(Recipe).filter_by(name="Filtered Recipe").first()
     assert result is not None
     assert result.recipe_id == 3
     assert result.name == "Filtered Recipe"
@@ -125,8 +124,7 @@ def test_contributor_model(mock_session):
     contributor = Contributor(contributor_id=1)
     mock_session.add(contributor)
     mock_session.commit()
-    result = mock_session.query(Contributor).filter_by(
-        contributor_id=1).first()
+    result = mock_session.query(Contributor).filter_by(contributor_id=1).first()
     assert result.contributor_id == 1
 
 
