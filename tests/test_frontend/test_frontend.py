@@ -134,3 +134,22 @@ def test_display_minutes_byfeature(df_results):
     with patch("streamlit.pyplot") as pyplot:
         frontend.display_minutes_byfeature(df_results)
         assert pyplot.called
+
+
+def test_display_sidebar_one_word():
+    with patch("streamlit.write") as mock_write:
+        frontend.display_sidebar(5, "One word")
+        mock_write.assert_any_call("Nombre d'ingrédients : 5")
+        mock_write.assert_any_call("Ingrédients utilisés dans les analyses :")
+        mock_write.assert_any_call(
+            "Récupération des ingrédients à un mot. "
+            "Réduction des autres ingrédients à un mot parmi ceux sélectionnés précédemment."
+        )
+
+
+def test_display_sidebar_all_ingredients():
+    with patch("streamlit.write") as mock_write:
+        frontend.display_sidebar(10, "All")
+        mock_write.assert_any_call("Nombre d'ingrédients : 10")
+        mock_write.assert_any_call("Ingrédients utilisés dans les analyses :")
+        mock_write.assert_any_call("Tous les ingrédients du dataset initial.")

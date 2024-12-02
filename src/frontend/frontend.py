@@ -321,7 +321,7 @@ def display_sidebar(nb_ingredient, selected_data):
     nb_ingredient : int
         Nombre total d'ingrédients.
     selected_data : str
-        Type de données sélectionné pour les ingrédients : 
+        Type de données sélectionné pour les ingrédients :
         "One word" pour les ingrédients à un mot, ou un autre type pour inclure tous les ingrédients.
 
     Returns
