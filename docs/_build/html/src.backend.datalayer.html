@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+
+<html lang="fr" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>src.backend.datalayer package &#8212; Documentation Webapp streamlit d&#39;analyse de données 0.1</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=af8511e3"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=e6b791cb"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Recherche" href="search.html" />
+    <link rel="next" title="src.frontend package" href="src.frontend.html" />
+    <link rel="prev" title="src.backend package" href="src.backend.html" />
+
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+
+
+
+
+
+  </head><body>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+
+
+          <div class="body" role="main">
+
+  <section id="src-backend-datalayer-package">
+<h1>src.backend.datalayer package<a class="headerlink" href="#src-backend-datalayer-package" title="Lien vers cette rubrique">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Lien vers cette rubrique">¶</a></h2>
+</section>
+<section id="module-src.backend.datalayer.cooking">
+<span id="src-backend-datalayer-cooking-module"></span><h2>src.backend.datalayer.cooking module<a class="headerlink" href="#module-src.backend.datalayer.cooking" title="Lien vers cette rubrique">¶</a></h2>
+<p>Module de gestion des modèles de base de données de cuisine et des sessions.</p>
+<p>Ce module définit les modèles de base de données et fournit des fonctions pour interagir avec la base de données.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.BaseModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.backend.datalayer.cooking.</span></span><span class="sig-name descname"><span class="pre">BaseModel</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.BaseModel" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Récupère tous les objets ou applique des filtres dynamiques.</p>
+<p>Retourne une ObjectCollection qui permet la conversion en DataFrame.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.BaseModel.as_dict">
+<span class="sig-name descname"><span class="pre">as_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.cooking.BaseModel.as_dict" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Retourne les attributs de l’objet sous forme de dictionnaire.</p>
+<section id="retourne">
+<h3>Retourne<a class="headerlink" href="#retourne" title="Lien vers cette rubrique">¶</a></h3>
+<dl class="simple">
+<dt>dict</dt><dd><p>Un dictionnaire contenant les attributs de l’objet.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.BaseModel.get_all">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">filters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.cooking.BaseModel.get_all" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Récupère tous les objets ou applique des filtres dynamiques.</p>
+<p>Retourne une ObjectCollection.</p>
+<section id="parametres">
+<h3>Paramètres<a class="headerlink" href="#parametres" title="Lien vers cette rubrique">¶</a></h3>
+<dl class="simple">
+<dt>session<span class="classifier">Session</span></dt><dd><p>La session de base de données utilisée pour interroger le modèle.</p>
+</dd>
+<dt>filters<span class="classifier">dict</span></dt><dd><p>Des filtres optionnels à appliquer à la requête.</p>
+</dd>
+</dl>
+</section>
+<section id="id1">
+<h3>Retourne<a class="headerlink" href="#id1" title="Lien vers cette rubrique">¶</a></h3>
+<dl class="simple">
+<dt>ObjectCollection</dt><dd><p>Une collection d’objets correspondant à la requête.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.BaseModel.to_dataframe">
+<span class="sig-name descname"><span class="pre">to_dataframe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.cooking.BaseModel.to_dataframe" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Convertit l’instance actuelle de l’objet en un DataFrame à une seule ligne.</p>
+<section id="id2">
+<h3>Retourne<a class="headerlink" href="#id2" title="Lien vers cette rubrique">¶</a></h3>
+<dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>Un DataFrame contenant les données de l’objet.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Contributor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.backend.datalayer.cooking.</span></span><span class="sig-name descname"><span class="pre">Contributor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.cooking.Contributor" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code>, <a class="reference internal" href="#src.backend.datalayer.cooking.BaseModel" title="src.backend.datalayer.cooking.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>Modèle de table Contributor avec relations pour la base de données.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Contributor.contributor_id">
+<span class="sig-name descname"><span class="pre">contributor_id</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Contributor.contributor_id" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Contributor.recipes">
+<span class="sig-name descname"><span class="pre">recipes</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Contributor.recipes" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Ingredient">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.backend.datalayer.cooking.</span></span><span class="sig-name descname"><span class="pre">Ingredient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.cooking.Ingredient" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code>, <a class="reference internal" href="#src.backend.datalayer.cooking.BaseModel" title="src.backend.datalayer.cooking.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>Modèle de table Ingredient avec relations pour la base de données.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Ingredient.count_review">
+<span class="sig-name descname"><span class="pre">count_review</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Ingredient.count_review" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Ingredient.ingredient_id">
+<span class="sig-name descname"><span class="pre">ingredient_id</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Ingredient.ingredient_id" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Ingredient.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Ingredient.name" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Ingredient.nb_recette">
+<span class="sig-name descname"><span class="pre">nb_recette</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Ingredient.nb_recette" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Ingredient.recipes">
+<span class="sig-name descname"><span class="pre">recipes</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Ingredient.recipes" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Ingredient.sum_rating">
+<span class="sig-name descname"><span class="pre">sum_rating</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Ingredient.sum_rating" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.ObjectCollection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.backend.datalayer.cooking.</span></span><span class="sig-name descname"><span class="pre">ObjectCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objects</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.cooking.ObjectCollection" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Pour convertir la collection d’objets en DataFrame et pour itérer.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.ObjectCollection.to_dataframe">
+<span class="sig-name descname"><span class="pre">to_dataframe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.cooking.ObjectCollection.to_dataframe" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Convertit la collection d’objets en DataFrame.</p>
+<section id="id3">
+<h3>Retourne<a class="headerlink" href="#id3" title="Lien vers cette rubrique">¶</a></h3>
+<dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>Un DataFrame contenant les données des objets.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Recipe">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.backend.datalayer.cooking.</span></span><span class="sig-name descname"><span class="pre">Recipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.cooking.Recipe" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code>, <a class="reference internal" href="#src.backend.datalayer.cooking.BaseModel" title="src.backend.datalayer.cooking.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>Modèle de table Recipe avec relations pour la base de données.</p>
+<p>En particulier, recipe à les ingrédients (objet ingredient) et les reviews (review) comme attribut.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Recipe.avg_rating">
+<span class="sig-name descname"><span class="pre">avg_rating</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Recipe.avg_rating" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Recipe.contributors">
+<span class="sig-name descname"><span class="pre">contributors</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Recipe.contributors" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Recipe.description">
+<span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Recipe.description" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Recipe.ingredients">
+<span class="sig-name descname"><span class="pre">ingredients</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Recipe.ingredients" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Recipe.minutes">
+<span class="sig-name descname"><span class="pre">minutes</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Recipe.minutes" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Recipe.n_ingredients">
+<span class="sig-name descname"><span class="pre">n_ingredients</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Recipe.n_ingredients" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Recipe.n_steps">
+<span class="sig-name descname"><span class="pre">n_steps</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Recipe.n_steps" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Recipe.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Recipe.name" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Recipe.nb_rating">
+<span class="sig-name descname"><span class="pre">nb_rating</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Recipe.nb_rating" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Recipe.recipe_id">
+<span class="sig-name descname"><span class="pre">recipe_id</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Recipe.recipe_id" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Recipe.reviewers">
+<span class="sig-name descname"><span class="pre">reviewers</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Recipe.reviewers" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Recipe.reviews">
+<span class="sig-name descname"><span class="pre">reviews</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Recipe.reviews" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Recipe.steps">
+<span class="sig-name descname"><span class="pre">steps</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Recipe.steps" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Recipe.submitted">
+<span class="sig-name descname"><span class="pre">submitted</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Recipe.submitted" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Review">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.backend.datalayer.cooking.</span></span><span class="sig-name descname"><span class="pre">Review</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.cooking.Review" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code>, <a class="reference internal" href="#src.backend.datalayer.cooking.BaseModel" title="src.backend.datalayer.cooking.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>Modèle de table Review avec relations pour la base de données.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Review.rating">
+<span class="sig-name descname"><span class="pre">rating</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Review.rating" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Review.recipes">
+<span class="sig-name descname"><span class="pre">recipes</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Review.recipes" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Review.review">
+<span class="sig-name descname"><span class="pre">review</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Review.review" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Review.review_date">
+<span class="sig-name descname"><span class="pre">review_date</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Review.review_date" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Review.review_id">
+<span class="sig-name descname"><span class="pre">review_id</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Review.review_id" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Review.reviewers">
+<span class="sig-name descname"><span class="pre">reviewers</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Review.reviewers" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Reviewer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.backend.datalayer.cooking.</span></span><span class="sig-name descname"><span class="pre">Reviewer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.cooking.Reviewer" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Base</span></code>, <a class="reference internal" href="#src.backend.datalayer.cooking.BaseModel" title="src.backend.datalayer.cooking.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>Modèle de table Reviewer avec relations pour la base de données.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Reviewer.recipes">
+<span class="sig-name descname"><span class="pre">recipes</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Reviewer.recipes" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Reviewer.reviewer_id">
+<span class="sig-name descname"><span class="pre">reviewer_id</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Reviewer.reviewer_id" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.Reviewer.reviews">
+<span class="sig-name descname"><span class="pre">reviews</span></span><a class="headerlink" href="#src.backend.datalayer.cooking.Reviewer.reviews" title="Lien vers cette définition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.create_db_engine">
+<span class="sig-prename descclassname"><span class="pre">src.backend.datalayer.cooking.</span></span><span class="sig-name descname"><span class="pre">create_db_engine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.cooking.create_db_engine" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Crée et retourne un moteur de base de données SQLAlchemy.</p>
+<section id="id4">
+<h3>Paramètres<a class="headerlink" href="#id4" title="Lien vers cette rubrique">¶</a></h3>
+<dl class="simple">
+<dt>env<span class="classifier">dict</span></dt><dd><p>Un dictionnaire contenant les informations de connexion à la base de données.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>Retourne<a class="headerlink" href="#id5" title="Lien vers cette rubrique">¶</a></h3>
+<dl class="simple">
+<dt>sqlalchemy.engine.Engine</dt><dd><p>Un moteur de base de données SQLAlchemy.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.backend.datalayer.cooking.load_environment">
+<span class="sig-prename descclassname"><span class="pre">src.backend.datalayer.cooking.</span></span><span class="sig-name descname"><span class="pre">load_environment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.cooking.load_environment" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Charge les variables d’environnement à partir d’un fichier .env.</p>
+<section id="id6">
+<h3>Retourne<a class="headerlink" href="#id6" title="Lien vers cette rubrique">¶</a></h3>
+<dl class="simple">
+<dt>dict</dt><dd><p>Un dictionnaire contenant les variables d’environnement pour la base de données.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+<section id="module-src.backend.datalayer.initdata">
+<span id="src-backend-datalayer-initdata-module"></span><h2>src.backend.datalayer.initdata module<a class="headerlink" href="#module-src.backend.datalayer.initdata" title="Lien vers cette rubrique">¶</a></h2>
+<p>Création dataframes à partir des fichiers de données.</p>
+<p>Utilisé uniquement pour le script de création de la base de donnnées.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.backend.datalayer.initdata.DataLayer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.backend.datalayer.initdata.</span></span><span class="sig-name descname"><span class="pre">DataLayer</span></span><a class="headerlink" href="#src.backend.datalayer.initdata.DataLayer" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>objet regroupant les structures (dataframe) des fichiers de données.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.backend.datalayer.initdata.DataLayer.get_ingr_map">
+<span class="sig-name descname"><span class="pre">get_ingr_map</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.initdata.DataLayer.get_ingr_map" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Récupère les données du fichier ingr_map.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.backend.datalayer.initdata.DataLayer.get_interactions_test">
+<span class="sig-name descname"><span class="pre">get_interactions_test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.initdata.DataLayer.get_interactions_test" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Getter interaction_test.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.backend.datalayer.initdata.DataLayer.get_interactions_train">
+<span class="sig-name descname"><span class="pre">get_interactions_train</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.initdata.DataLayer.get_interactions_train" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Getter interactions_train.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.backend.datalayer.initdata.DataLayer.get_interactions_validation">
+<span class="sig-name descname"><span class="pre">get_interactions_validation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.initdata.DataLayer.get_interactions_validation" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Récupère les données du fichier interactions_validation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.backend.datalayer.initdata.DataLayer.get_pp_recipes">
+<span class="sig-name descname"><span class="pre">get_pp_recipes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.initdata.DataLayer.get_pp_recipes" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Récupère les données du fichier pp_recipes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.backend.datalayer.initdata.DataLayer.get_pp_users">
+<span class="sig-name descname"><span class="pre">get_pp_users</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.initdata.DataLayer.get_pp_users" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Récupère les données du fichier pp_users.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.backend.datalayer.initdata.DataLayer.get_raw_interactions">
+<span class="sig-name descname"><span class="pre">get_raw_interactions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.initdata.DataLayer.get_raw_interactions" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Récupère les données du fichier raw_interactions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.backend.datalayer.initdata.DataLayer.get_raw_recipes">
+<span class="sig-name descname"><span class="pre">get_raw_recipes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.initdata.DataLayer.get_raw_recipes" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Récupère les données du fichier raw_recipes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.backend.datalayer.initdata.DataLayer.load_csv">
+<span class="sig-name descname"><span class="pre">load_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.initdata.DataLayer.load_csv" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Charge un fichier CSV en DataFrame pandas.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.backend.datalayer.initdata.DataLayer.load_data">
+<span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.initdata.DataLayer.load_data" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Charge tous les fichiers de données.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.backend.datalayer.initdata.DataLayer.load_pickle">
+<span class="sig-name descname"><span class="pre">load_pickle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.backend.datalayer.initdata.DataLayer.load_pickle" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Charge un fichier pickle.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="src.backend.datalayer.initdata.DataLayerException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.backend.datalayer.initdata.</span></span><span class="sig-name descname"><span class="pre">DataLayerException</span></span><a class="headerlink" href="#src.backend.datalayer.initdata.DataLayerException" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Classe de base pour les exceptions de DataLayer.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="src.backend.datalayer.initdata.FileUnreadableError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.backend.datalayer.initdata.</span></span><span class="sig-name descname"><span class="pre">FileUnreadableError</span></span><a class="headerlink" href="#src.backend.datalayer.initdata.FileUnreadableError" title="Lien vers cette définition">¶</a></dt>
+<dd><p>Bases : <a class="reference internal" href="#src.backend.datalayer.initdata.DataLayerException" title="src.backend.datalayer.initdata.DataLayerException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataLayerException</span></code></a></p>
+<p>Exception levée lorsque le fichier n’est pas lisible.</p>
+</dd></dl>
+
+</section>
+<section id="module-src.backend.datalayer">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.backend.datalayer" title="Lien vers cette rubrique">¶</a></h2>
+</section>
+</section>
+
+
+          </div>
+
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Webapp streamlit d'analyse de données</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">src</a><ul>
+  <li><a href="src.html">src package</a><ul>
+  <li><a href="src.backend.html">src.backend package</a><ul>
+      <li>Previous: <a href="src.backend.html" title="Chapitre précédent">src.backend package</a></li>
+      <li>Next: <a href="src.frontend.html" title="Chapitre suivant">src.frontend package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Laury, Hugo, Jael.
+
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+
+      |
+      <a href="_sources/src.backend.datalayer.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+
+
+
+  </body>
+</html>
