@@ -3,6 +3,15 @@ Cette application génère une interface streamlit pour explorer les données is
 - data\RAW_interactions.csv
 - data\RAW_recipes.csv
 
+Structure du projet :
+- docs/ : Documentation du projet.
+- scripts/ : Scripts utilitaires pour des tâches diverses (importation de données, nettoyage, etc.). Cela permet en particulier la création de la base de données utilisée dans l'application.
+- src/ : Code source principal de l'application.
+- src/backend/datalayer/ : couche d'accès au données. En particulier, cooking.py définit l'ensemble des classes qui permettent de manipuler les objets de la base de données.
+- src/backend/ : backend.py regroupe l'ensemble des méthodes permettant le calcul et la mise en forme des données.
+- src/frontend/ : fonctions et classes nécessaire pour l'affichage de l'application
+- tests/ : Tests unitaires et d'intégration pour assurer la qualité du code.
+
 Installation :
 Données :
 L'application utilise une base de données postgres.
